@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Search</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <!-- Top Bar - Fixed container (BACKGROUND ONLY) -->
+    <div id="top-bar">
+        <!-- No content needed here, just for background -->
+    </div>
+
+    <!-- Logo Container - Fixed Top Left (ONLY ONCE) -->
+    <div id="logo-container">
+        <img src="images/logo.jpg" alt="Logo">
+    </div>
+
+    <!-- Menu Panel - Fixed -->
+    <div id="menu-panel">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="search.html" class="active">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+				<li><a href="Terms.html">Legal</a></li>
+
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Search Controls Panel (Search.html ONLY) - Fixed -->
+    <div id="search-controls">
+        <input type="text" id="search-input" placeholder="Search by genre, instrument, keyword, mood">
+        <div class="sort-container">
+            <span class="sort-label">Show results:</span>
+            <select id="sort-select">
+                <option value="alphabetical-asc">Alphabetically (A-Z)</option>
+                <option value="alphabetical-desc">Alphabetically (Z-A)</option>
+                <option value="isrc-asc">Oldest First</option>
+                <option value="isrc-desc">Most Recent</option>
+                <option value="random">Random Order</option>
+            </select>
+        </div>
+    </div>
+
+<!-- Hamburger Icon Button (Mobile) -->
+    <button id="hamburger-icon" aria-label="Toggle menu" aria-expanded="false">
+        <span></span> <!-- Line 1 -->
+        <span></span> <!-- Line 2 -->
+        <span></span> <!-- Line 3 -->
+    </button>
+
+    <!-- Mobile Menu Container -->
+    <div id="mobile-menu" aria-hidden="true">
+        <nav>
+            <!-- Copy or move the same menu links here -->
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="search.html" class="active">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+				<li><a href="Terms.html">Legal</a></li>
+            </ul>
+        </nav>
+    </div>
+
+
+    <!-- Main content starts here -->
+    <div id="results"></div>
+    <div id="pagination-controls"></div>
+
+    <!-- Modal for showing all versions -->
+    <div id="versionsModal" class="modal">
+        <div class="modal-content">
+            <!-- Correct Modal Structure will be injected by JS -->
+        </div>
+    </div>
+
+
+	<footer id="page-footer">
+        <div class="footer-content">
+            <p>© 2024 8vb Music. All Rights Reserved.</p> <!-- Updated year -->
+            <nav class="footer-legal-nav">
+                 <a href="Terms.html#terms-of-service-main">Terms of Service</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="Terms.html#privacy-policy">Privacy Policy</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="Terms.html#cookie-statement">Cookie Policy</a>
+            </nav>
+        </div>
+    </footer>
+	
+	
+		<script src="js/script.js"></script>
+
+</body>
+</html>

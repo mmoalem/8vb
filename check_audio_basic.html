@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio & Artwork File Check</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        #container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #fff0f0; /* Light red background for missing items */
+            border: 1px solid #e0c0c0;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+        li span {
+            display: block;
+            font-size: 0.9em;
+            color: #555;
+        }
+         li strong {
+             color: #c00; /* Red text for missing file types */
+         }
+        .success {
+             color: green;
+             font-weight: bold;
+        }
+         .error {
+             color: red;
+             font-weight: bold;
+         }
+         .note {
+             font-size: 0.9em;
+             color: #666;
+             margin-bottom: 15px;
+             border-left: 3px solid #ccc;
+             padding-left: 10px;
+         }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <h1>Check for Missing Audio & Artwork Files</h1>
+        <p>This tool checks if the WAV/MP3 files listed in <code>music_data.json</code> exist on <code>https://audio.8vbmusic.com/</code> and if the corresponding artwork file exists locally in the <code>./Artwork/</code> folder.</p>
+        <p class="note"><strong>Important:</strong> For the artwork check to work, this HTML file must be served by a local web server (e.g., XAMPP, Python http.server, VS Code Live Server), not opened directly as a <code>file:///</code> URI.</p>
+
+        <button id="check-button">Start Check</button>
+		
+		<fieldset id="filter-controls" style="margin-bottom: 20px; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+            <legend>Filter Results:</legend>
+            <label style="margin-right: 15px;">
+                <input type="radio" name="filter" value="all" checked> Show All Issues
+            </label>
+            <label style="margin-right: 15px;">
+                <input type="radio" name="filter" value="wav"> Missing WAV Only
+            </label>
+            <label style="margin-right: 15px;">
+                <input type="radio" name="filter" value="mp3"> Missing MP3 Only
+            </label>
+            <label style="margin-right: 15px;">
+                <input type="radio" name="filter" value="artwork"> Missing/Invalid Artwork Only
+            </label>
+        </fieldset>
+
+        <div id="status">Status: Idle</div>
+
+        <h2>Tracks with Potentially Missing Files:</h2>
+        <ul id="missing-files-list">
+            <!-- Results will be listed here -->
+        </ul>
+    </div>
+
+    <script>
+        const checkButton = document.getElementById('check-button');
+        const statusDiv = document.getElementById('status');
+        const resultsList = document.getElementById('missing-files-list');
+        const filterControls = document.getElementById('filter-controls'); // Get the fieldset
+        const audioBaseUrl = 'https://audio.8vbmusic.com'; // Use HTTPS
+        const artworkBaseFolder = 'Artwork';
+        let musicData = [];
+        let allIssues = []; // Array to store tracks with issues
+
+        // --- Function to check file existence (same as before) ---
+        async function checkFileExists(url) {
+            try {
+                const response = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+                if (response.status === 404) {
+                    return false;
+                }
+                // Treat redirects as potentially problematic for direct linking? Maybe only allow 2xx.
+                // return response.ok; // Allows 2xx status codes
+                return response.status >= 200 && response.status < 300; // Stricter: Only 2xx are OK
+            } catch (error) {
+                console.error(`Network or other error checking ${url}:`, error);
+                return false;
+            }
+        }
+
+                // --- Function to Display Filtered Results (WITH SORTING) ---
+        function displayResults() {
+            const selectedFilter = document.querySelector('input[name="filter"]:checked').value;
+            resultsList.innerHTML = ''; // Clear current list
+            let displayCount = 0;
+
+            console.log(`Filtering results for: ${selectedFilter}`);
+
+            // --- SORTING ADDED HERE ---
+            // Sort the allIssues array alphabetically by Track Name (case-insensitive)
+            // before filtering and displaying.
+            allIssues.sort((a, b) => {
+                // Get track names, default to empty string if missing/null
+                const nameA = String(a.trackData['Track Name'] || '').toLowerCase();
+                const nameB = String(b.trackData['Track Name'] || '').toLowerCase();
+
+                // Use localeCompare for proper alphabetical sorting
+                return nameA.localeCompare(nameB);
+            });
+            // --- END OF SORTING ---
+
+            // Now iterate through the *sorted* issues
+            for (const issue of allIssues) {
+                let shouldDisplay = false;
+
+                // Determine if the current issue matches the filter (same logic as before)
+                switch (selectedFilter) {
+                    case 'wav':
+                        if (!issue.wavExists) shouldDisplay = true;
+                        break;
+                    case 'mp3':
+                        if (!issue.mp3Exists || issue.mp3GenerationFailed) shouldDisplay = true;
+                        break;
+                    case 'artwork':
+                        if (!issue.artworkFilenameValid || (issue.artworkFilenameValid && !issue.artworkExists)) shouldDisplay = true;
+                        break;
+                    case 'all':
+                    default:
+                        shouldDisplay = true; // Show all recorded issues
+                        break;
+                }
+
+                if (shouldDisplay) {
+                    displayCount++;
+                    const listItem = document.createElement('li');
+                    let issues = [];
+
+                    // Build the list of specific issues (same logic as before)
+                    if (!issue.wavExists) issues.push("<strong>WAV</strong>");
+                    if (issue.mp3GenerationFailed) issues.push("(MP3 filename generation failed)");
+                    else if (!issue.mp3Exists) issues.push("<strong>MP3</strong>");
+
+                    if (!issue.artworkFilenameValid) issues.push("<strong>Artwork Filename Invalid/Missing in JSON</strong>");
+                    else if (!issue.artworkExists) issues.push("<strong>Artwork</strong>");
+
+                    const uniqueIssues = [...new Set(issues)].filter(Boolean);
+
+                    // Create list item HTML (same logic, including bold/larger track name)
+                    listItem.innerHTML = `Missing/Invalid: ${uniqueIssues.join(' and ')} for:
+                                        <br><strong style="font-size: 1.1em;">Track: ${issue.trackData['Track Name'] || 'N/A'}</strong>
+                                        <span>Artist: ${issue.trackData['Artist'] || 'N/A'}</span>
+                                        <span>Expected WAV: ${issue.originalWavName || 'N/A'} ${issue.wavExists ? '<span style="color:green;">(Found)</span>' : '<span style="color:red;">(Missing)</span>'}</span>
+                                        ${!issue.mp3GenerationFailed ? `<span>Expected MP3: ${issue.mp3FileName || 'N/A'} ${issue.mp3Exists ? '<span style="color:green;">(Found)</span>' : '<span style="color:red;">(Missing)</span>'}</span>` : '<span style="color:orange;">(MP3 filename generation failed)</span>'}
+                                        ${issue.artworkFilenameValid ? `<span>Expected Artwork: ${issue.artworkFileName || 'N/A'} ${issue.artworkExists ? '<span style="color:green;">(Found)</span>' : '<span style="color:red;">(Missing)</span>'}</span>` : '<span style="color:orange;">(Artwork filename invalid/missing in JSON)</span>'}
+                                        `;
+                    resultsList.appendChild(listItem);
+                }
+            }
+            // Update heading (same as before)
+             document.querySelector('h2').textContent = `Tracks with Potentially Missing Files (${displayCount} matching filter "${selectedFilter}"):`;
+
+            console.log(`Displayed ${displayCount} issues matching filter.`);
+        }
+
+
+        // --- Main function to perform checks (modified) ---
+        async function performCheck() {
+            checkButton.disabled = true;
+            filterControls.style.pointerEvents = 'none'; // Disable filters during check
+            filterControls.style.opacity = '0.5';
+            statusDiv.textContent = 'Status: Loading music data...';
+            statusDiv.className = '';
+            resultsList.innerHTML = ''; // Clear previous results
+            allIssues = []; // Reset issues array for new check
+            let issueCount = 0;
+
+            // 1. Load JSON data (same as before)
+            try {
+                // Use cache:'no-store' to ensure fresh data if JSON might change
+                const response = await fetch('music_data.json', { cache: 'no-store' });
+                 if (!response.ok) {
+                     throw new Error(`HTTP error! status: ${response.status}`);
+                 }
+                musicData = await response.json();
+                 console.log(`Loaded ${musicData.length} tracks from JSON.`);
+            } catch (error) {
+                statusDiv.textContent = `Status: Error loading music_data.json - ${error.message}`;
+                statusDiv.className = 'error';
+                checkButton.disabled = false;
+                filterControls.style.pointerEvents = 'auto';
+                filterControls.style.opacity = '1';
+                 console.error('Error loading music data:', error);
+                return;
+            }
+
+             if (musicData.length === 0) {
+                 statusDiv.textContent = 'Status: No tracks found in music_data.json.';
+                 statusDiv.className = 'error';
+                 checkButton.disabled = false;
+                 filterControls.style.pointerEvents = 'auto';
+                 filterControls.style.opacity = '1';
+                 return;
+             }
+
+            // 2. Iterate and check each track
+            statusDiv.textContent = 'Status: Checking files... (This may take a while)';
+            let checkedCount = 0;
+
+            for (const track of musicData) {
+                let originalWavName = track['wav file name']; // Keep original for display
+                let wavFileName = originalWavName; // Work with this one
+                const artworkFileNameInput = track['artwork'];
+                let mp3FileName = null;
+                let artworkFileName = null; // Store trimmed version
+
+                let wavExists = false;
+                let mp3Exists = false;
+                let artworkExists = false;
+                let mp3GenerationFailed = false;
+                let artworkFilenameValid = false;
+                let trackHasIssue = false; // Flag if *any* issue found for this track
+
+                // --- Validate and prepare filenames ---
+                if (!wavFileName || typeof wavFileName !== 'string') {
+                    console.warn('Track issue: "wav file name" missing or invalid:', track);
+                    trackHasIssue = true;
+                    // Don't continue audio checks if base filename is bad
+                } else {
+                    wavFileName = wavFileName.trim();
+                    mp3FileName = wavFileName.replace(/\.wav$/i, '.mp3');
+                    mp3GenerationFailed = (mp3FileName === wavFileName || mp3FileName === null);
+                    if (mp3GenerationFailed) {
+                         console.warn(`MP3 filename generation failed for: ${wavFileName}`);
+                         trackHasIssue = true; // Count generation failure as an issue
+                    }
+                }
+
+                if (!artworkFileNameInput || typeof artworkFileNameInput !== 'string' || artworkFileNameInput.trim() === '') {
+                    console.warn('Track issue: Artwork filename invalid/missing:', track);
+                    artworkFilenameValid = false;
+                    trackHasIssue = true; // Count bad artwork filename as an issue
+                } else {
+                    artworkFileName = artworkFileNameInput.trim();
+                    artworkFilenameValid = true;
+                }
+
+                // --- Perform checks if possible ---
+                 try {
+                    if (wavFileName) { // Only check if we have a valid wav filename
+                        const wavPath = `${audioBaseUrl}/${encodeURI(wavFileName)}`;
+                        wavExists = await checkFileExists(wavPath);
+                        if (!wavExists) trackHasIssue = true; // Missing file is an issue
+
+                        if (!mp3GenerationFailed && mp3FileName) {
+                            const mp3Path = `${audioBaseUrl}/${encodeURI(mp3FileName)}`;
+                            mp3Exists = await checkFileExists(mp3Path);
+                            if (!mp3Exists) trackHasIssue = true; // Missing file is an issue
+                        } else {
+                            mp3Exists = false; // Cannot exist if generation failed
+                        }
+                    } else {
+                         // Cannot check audio if wav filename was invalid
+                         wavExists = false;
+                         mp3Exists = false;
+                    }
+
+                    if (artworkFilenameValid && artworkFileName) {
+                        const artworkPath = `${artworkBaseFolder}/${encodeURI(artworkFileName)}`;
+                        artworkExists = await checkFileExists(artworkPath);
+                        if (!artworkExists) trackHasIssue = true; // Missing file is an issue
+                    } else {
+                         artworkExists = false; // Cannot exist if filename was invalid
+                    }
+
+                 } catch (checkError) {
+                      console.error("Error during file check process for track:", track, checkError);
+                      // Potentially add an error object to display differently?
+                      trackHasIssue = true; // Count errors as issues
+                 }
+
+                // --- Store result if any issue was found ---
+                if (trackHasIssue) {
+                    issueCount++;
+                    allIssues.push({
+                        trackData: track,
+                        originalWavName: originalWavName, // Store original for display
+                        wavExists: wavExists,
+                        mp3FileName: mp3FileName, // Store generated name
+                        mp3Exists: mp3Exists,
+                        artworkFileName: artworkFileName, // Store trimmed name
+                        artworkExists: artworkExists,
+                        mp3GenerationFailed: mp3GenerationFailed,
+                        artworkFilenameValid: artworkFilenameValid
+                    });
+                }
+
+                checkedCount++;
+                statusDiv.textContent = `Status: Checking files... (${checkedCount} / ${musicData.length})`;
+
+            } // end for loop
+
+            // 3. Final Status
+            if (issueCount === 0) {
+                statusDiv.textContent = `Status: Check complete. All ${musicData.length} tracks appear to have corresponding WAV, MP3, and Artwork files accessible.`;
+                statusDiv.className = 'success';
+                 document.querySelector('h2').textContent = `Tracks with Potentially Missing Files (0):`;
+            } else {
+                 statusDiv.textContent = `Status: Check complete. Found ${issueCount} track(s) with potentially missing or invalid files/data.`;
+                 statusDiv.className = 'error';
+                 // Display results filtered by 'all' initially
+                 displayResults();
+            }
+            checkButton.disabled = false;
+            filterControls.style.pointerEvents = 'auto'; // Re-enable filters
+            filterControls.style.opacity = '1';
+        }
+
+        // --- Attach Event Listeners ---
+        checkButton.addEventListener('click', performCheck);
+
+        // Add listeners to radio buttons to re-filter when changed
+        filterControls.querySelectorAll('input[name="filter"]').forEach(radio => {
+            radio.addEventListener('change', displayResults);
+        });
+
+    </script>
+
+</body>
+</html>
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+<html><head><base href="https://web-data-converter.io/" />
+<title>TSV to JSON Converter</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    line-height: 1.6;
+  }
+  h1 {
+    color: #333;
+    text-align: center;
+  }
+  #fileInput {
+    display: block;
+    margin: 20px auto;
+  }
+  #output {
+    white-space: pre-wrap;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  #downloadBtn {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  #downloadBtn:hover {
+    background-color: #45a049;
+  }
+</style>
+</head>
+<body>
+  <h1>TSV to JSON Converter</h1>
+  <input type="file" id="fileInput" accept=".tsv">
+  <pre id="output"></pre>
+  <button id="downloadBtn" style="display: none;">Download JSON</button>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const output = document.getElementById('output');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    let jsonOutput = '';
+
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const content = e.target.result;
+        const json = tsvToJson(content);
+        jsonOutput = JSON.stringify(json, null, 2);
+        output.textContent = jsonOutput;
+        downloadBtn.style.display = 'block';
+      };
+
+      reader.readAsText(file);
+    });
+
+    downloadBtn.addEventListener('click', function() {
+      const blob = new Blob([jsonOutput], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'converted.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    function tsvToJson(tsv) {
+      const lines = tsv.split('\n');
+      const headers = lines[0].split('\t');
+      const result = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const obj = {};
+        const currentLine = lines[i].split('\t');
+
+        for (let j = 0; j < headers.length; j++) {
+          obj[headers[j]] = currentLine[j];
+        }
+
+        result.push(obj);
+      }
+
+      return result;
+    }
+  </script>
+
+  <p>Welcome to the TSV to JSON Converter! This simple tool allows you to easily convert your Tab-Separated Values (TSV) files into JSON format. Here's how to use it:</p>
+
+  <ol>
+    <li>Click the "Choose File" button above and select your TSV file.</li>
+    <li>The converter will automatically process your file and display the JSON output in the box below.</li>
+    <li>Once conversion is complete, a "Download JSON" button will appear. Click it to download the converted JSON file.</li>
+  </ol>
+
+  <p>This tool is part of a suite of data conversion utilities available at Web Data Converter. Check out our other tools:</p>
+
+  <ul>
+    <li><a href="https://web-data-converter.io/csv-to-json">CSV to JSON Converter</a></li>
+    <li><a href="https://web-data-converter.io/json-to-csv">JSON to CSV Converter</a></li>
+    <li><a href="https://web-data-converter.io/xml-to-json">XML to JSON Converter</a></li>
+  </ul>
+
+  <p>Our mission is to make data conversion as simple and accessible as possible. If you have any feedback or suggestions for improvement, please don't hesitate to <a href="https://web-data-converter.io/contact">contact us</a>.</p>
+
+  <footer>
+    <p>&copy; 2023 Web Data Converter. All rights reserved. | <a href="https://web-data-converter.io/privacy">Privacy Policy</a> | <a href="https://web-data-converter.io/terms">Terms of Service</a></p>
+  </footer>
+</body>
+</html>

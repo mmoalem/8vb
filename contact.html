@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - 8vb Music</title> <!-- ****** CHANGED TITLE ****** -->
+    
+	<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <body>
+
+    <!-- Logo Container - Fixed Top Left -->
+    <div id="logo-container">
+        <img src="images/logo.jpg" alt="Logo">
+    </div>
+	
+	
+    <!-- Top Bar - Fixed container -->
+    <div id="top-bar">
+        <!-- Inner Wrapper - Constrains content to max-width -->
+        <div class="top-bar-content-wrapper">
+		
+		<!-- NEW: Group for Search and Menu -->
+            <div class="controls-group">
+
+            <!-- Search Controls - ONLY ON Search.html -->
+            <!-- Place this DIV *first* inside .top-bar-content-wrapper -->
+            <!-- This div will be ABSENT from index.html, cue-sheet-metadata.html, contact.html -->
+            <!-- Example for Search.html: -->
+            <!--
+            <div id="search-controls">
+                <input type="text" id="search-input" placeholder="Search The Library">
+                <div class="sort-container">
+                    <span class="sort-label">Show results:</span>
+                    <select id="sort-select">
+                        <option value="alphabetical-asc">Alphabetically (A-Z)</option>
+                        <option value="alphabetical-desc">Alphabetically (Z-A)</option>
+                        <option value="isrc-asc">Oldest First</option>
+                        <option value="isrc-desc">Most Recent</option>
+                        <option value="random">Random Order</option>
+                    </select>
+                </div>
+            </div>
+            -->
+
+            <!-- Menu Panel - Fixed -->
+    <div id="menu-panel">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="search.html">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
+                <li><a href="contact.html" class="active">Contact Us</a></li>
+				<li><a href="Terms.html">Legal</a></li>
+            </ul>
+        </nav>
+    </div>
+			
+			</div> <!-- End of .controls-group -->
+
+        </div> <!-- End of .top-bar-content-wrapper -->
+    </div> <!-- End of #top-bar -->
+	
+<!-- Hamburger Icon Button (Mobile) -->
+    <button id="hamburger-icon" aria-label="Toggle menu" aria-expanded="false">
+        <span></span> <!-- Line 1 -->
+        <span></span> <!-- Line 2 -->
+        <span></span> <!-- Line 3 -->
+    </button>
+
+    <!-- Mobile Menu Container -->
+    <div id="mobile-menu" aria-hidden="true">
+        <nav>
+            <!-- Copy or move the same menu links here -->
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="search.html">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
+                <li><a href="contact.html" class="active">Contact Us</a></li>
+				<li><a href="Terms.html">Legal</a></li>
+            </ul>
+        </nav>
+    </div>
+
+
+    <div class="main-content">
+        <!-- ****** PAGE-SPECIFIC CONTENT START ****** -->
+        <h1>Contact Us</h1>
+        <p>
+            Have questions, feedback, or need help finding the right track? Fill out the form below, and we'll get back to you as soon as possible.
+        </p>
+
+        <!-- Google Form Embed Container -->
+        <div class="embedded-iframe-container">
+             <!--
+                Instructions to get Google Form embed code:
+                1. Open your Google Form.
+                2. Click the "Send" button (top right).
+                3. Select the "<>" (Embed HTML) tab.
+                4. Adjust the width and height if needed (or use CSS).
+                5. Click "Copy".
+                6. Paste the <iframe> code BELOW, replacing the placeholder.
+            -->
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeqbTKL2YYSyyuFY-iRkr7ZaOcsBuR0dfkwVrXgyIgLCal02w/viewform?embedded=true" width="640" height="983" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+            <!-- Example: <iframe src="https://docs.google.com/forms/d/e/YOUR_UNIQUE_CODE_HERE/viewform?embedded=true" ...></iframe> -->
+        </div>
+        <!-- ****** PAGE-SPECIFIC CONTENT END ****** -->
+    </div>
+
+	<footer id="page-footer">
+        <div class="footer-content">
+            <p>© 2024 8vb Music. All Rights Reserved.</p> <!-- Updated year -->
+            <nav class="footer-legal-nav">
+                 <a href="Terms.html#terms-of-service-main">Terms of Service</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="Terms.html#privacy-policy">Privacy Policy</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="Terms.html#cookie-statement">Cookie Policy</a>
+            </nav>
+        </div>
+    </footer>
+	
+    <script src="js/script.js"></script>
+
+</body>
+</html>

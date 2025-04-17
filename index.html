@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - 8vb Music</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Top Bar - Fixed container (BACKGROUND ONLY) -->
+    <div id="top-bar"></div>
+
+    <!-- Logo Container - Fixed Top Left (ONLY ONCE) -->
+    <div id="logo-container">
+        <img src="images/logo.jpg" alt="Logo">
+    </div>
+
+    <!-- Menu Panel - Fixed -->
+    <div id="menu-panel">
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="search.html">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="Terms.html">Legal</a></li>
+            </ul>
+        </nav>
+    </div>
+
+<!-- Hamburger Icon Button (Mobile) -->
+    <button id="hamburger-icon" aria-label="Toggle menu" aria-expanded="false">
+        <span></span> <!-- Line 1 -->
+        <span></span> <!-- Line 2 -->
+        <span></span> <!-- Line 3 -->
+    </button>
+
+    <!-- Mobile Menu Container -->
+    <div id="mobile-menu" aria-hidden="true">
+        <nav>
+            <!-- Copy or move the same menu links here -->
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="search.html">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+				<li><a href="Terms.html">Legal</a></li>
+            </ul>
+        </nav>
+    </div>
+
+
+
+
+    <!-- Main Content Area for Homepage -->
+    <div class="main-content-home">
+
+        <!-- Top Row of Featured Albums -->
+        <div class="featured-albums">
+            
+            <div class="album-grid" id="top-album-grid">
+                <p>Loading albums...</p>
+            </div>
+        </div>
+
+        <!-- Central Content Block -->
+        <div class="home-welcome-content">
+            <h1>Welcome to 8vb Music production music library</h1>
+            <p>
+                Founded by musicians and video editors, our catalogue aims to address the requirements we encountered working in TV and Film post-production. However, our versatile music fits perfectly into any media project – games, podcasts, online content, and more. Our goal is to build a dynamic catalogue of distinctive music cues that are still easy to place into any edit timeline.
+                <br><br>
+                8vb Music is registered with <b>PRS/MCPS</b> and operate under the standard <b>PRS/MCPS</b> licensing, ensuring a straightforward clearance process for professional use worldwide, giving you peace of mind.
+                <br><br>
+                Explore our collection: You can search, audition, and download high-quality production music directly from our catalogue. Click any album cover on this page to browse its tracks, or <a href="search.html">search</a> our entire collection by keywords, genre, mood, instrumentation, and more.
+                <br><br>
+                Stems, cut-downs, and alternative mixes are available for most tracks. If you need these specific versions, please don't hesitate to <a href="contact.html">contact us</a> with your requirements.
+            </p>
+        </div>
+
+        <!-- Bottom Rows of Featured Albums -->
+        <div class="featured-albums">
+            <div class="album-grid" id="bottom-album-grid">
+                <!-- Album covers will be injected here by JS -->
+            </div>
+        </div>
+
+    </div><!-- End of .main-content-home -->
+
+	<footer id="page-footer">
+        <div class="footer-content">
+            <p>© 2024 8vb Music. All Rights Reserved.</p> <!-- Updated year -->
+            <nav class="footer-legal-nav">
+                 <a href="Terms.html#terms-of-service-main">Terms of Service</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="Terms.html#privacy-policy">Privacy Policy</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="Terms.html#cookie-statement">Cookie Policy</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Active link logic
+            const links = document.querySelectorAll('#menu-panel ul li a');
+            const currentPageFile = 'index.html';
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentPageFile) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            // Load and display albums
+            loadFeaturedAlbums();
+            
+            // Add resize listener to update albums on window resize
+            window.addEventListener('resize', debounce(function() {
+                updateAlbumDisplay();
+            }, 250));
+        });
+        
+        // Global variables to store album data
+        let allShuffledAlbums = [];
+        
+        // Debounce function to limit resize event handling
+        function debounce(func, wait) {
+            let timeout;
+            return function() {
+                clearTimeout(timeout);
+                timeout = setTimeout(func, wait);
+            };
+        }
+        
+        // Get current grid column count based on window width
+        function getCurrentColumnCount() {
+            const width = window.innerWidth;
+            if (width <= 550) return 2;
+            if (width <= 768) return 3;
+            if (width <= 1000) return 4;
+            if (width <= 1250) return 5;
+            return 6;
+        }
+
+        async function loadFeaturedAlbums() {
+            // Get the containers
+            const topAlbumGrid = document.getElementById('top-album-grid');
+            const bottomAlbumGrid = document.getElementById('bottom-album-grid');
+            
+            if (!topAlbumGrid || !bottomAlbumGrid) {
+                console.error("One or more album grid containers not found!");
+                return;
+            }
+
+            // Show loading message in top grid
+            topAlbumGrid.innerHTML = "<p>Loading albums...</p>";
+            bottomAlbumGrid.innerHTML = ""; // Clear bottom grid
+
+            try {
+                const response = await fetch('music_data.json');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const allTracks = await response.json();
+
+                // Extract unique albums
+                const uniqueAlbumsMap = new Map();
+                allTracks.forEach(track => {
+                    if (track.Album && track.artwork && !uniqueAlbumsMap.has(track.Album)) {
+                        uniqueAlbumsMap.set(track.Album, {
+                            albumName: track.Album,
+                            artworkFile: track.artwork
+                        });
+                    }
+                });
+                let uniqueAlbums = Array.from(uniqueAlbumsMap.values());
+                console.log(`Found ${uniqueAlbums.length} unique albums.`);
+
+                if (uniqueAlbums.length === 0) {
+                    topAlbumGrid.innerHTML = "<p>No albums found in library data.</p>";
+                    return;
+                }
+
+                // Shuffle and store albums for later use
+                uniqueAlbums.sort(() => Math.random() - 0.5);
+                allShuffledAlbums = uniqueAlbums;
+                
+                // Initial display based on current screen size
+                updateAlbumDisplay();
+
+            } catch (error) {
+                console.error('Error loading or processing album data:', error);
+                topAlbumGrid.innerHTML = `<p style="color: red;">Error loading album data.</p>`;
+                bottomAlbumGrid.innerHTML = "";
+            }
+        }
+        
+        // Function to update the album display based on current screen size
+        function updateAlbumDisplay() {
+            if (allShuffledAlbums.length === 0) return;
+            
+            const topAlbumGrid = document.getElementById('top-album-grid');
+            const bottomAlbumGrid = document.getElementById('bottom-album-grid');
+            
+            if (!topAlbumGrid || !bottomAlbumGrid) return;
+            
+            // Get current column count based on screen width
+            const columnCount = getCurrentColumnCount();
+            
+            // Calculate how many albums to show
+            const topRowCount = 1; // Always one row at the top
+            const bottomRowCount = 4; // Always four rows at the bottom
+            
+            const topAlbumCount = columnCount * topRowCount;
+            const bottomAlbumCount = columnCount * bottomRowCount;
+            
+            // Clear containers
+            topAlbumGrid.innerHTML = '';
+            bottomAlbumGrid.innerHTML = '';
+            
+            // Make sure we have enough albums (repeat if necessary)
+            const totalAlbumsNeeded = topAlbumCount + bottomAlbumCount;
+            let albumsToDisplay = [];
+            
+            if (allShuffledAlbums.length >= totalAlbumsNeeded) {
+                albumsToDisplay = [...allShuffledAlbums.slice(0, totalAlbumsNeeded)];
+            } else {
+                albumsToDisplay = [...allShuffledAlbums];
+                while (albumsToDisplay.length < totalAlbumsNeeded) {
+                    albumsToDisplay.push(allShuffledAlbums[albumsToDisplay.length % allShuffledAlbums.length]);
+                }
+            }
+            
+            // Populate the grids with the correct number of albums
+            populateAlbumGrid(topAlbumGrid, albumsToDisplay.slice(0, topAlbumCount));
+            populateAlbumGrid(bottomAlbumGrid, albumsToDisplay.slice(topAlbumCount, totalAlbumsNeeded));
+        }
+        
+        // Function to populate an album grid
+        function populateAlbumGrid(targetElement, albums) {
+            if (!albums || albums.length === 0) return;
+
+            albums.forEach(albumData => {
+                const artworkPath = `Artwork/${albumData.artworkFile || 'default_artwork.png'}`;
+                const albumNameEncoded = encodeURIComponent(albumData.albumName);
+                const searchLink = `search.html?album=${albumNameEncoded}`;
+
+                const albumLink = document.createElement('a');
+                albumLink.href = searchLink;
+                albumLink.className = 'album-link';
+                albumLink.title = `View tracks from ${albumData.albumName}`;
+
+                const albumImg = document.createElement('img');
+                albumImg.src = encodeURI(artworkPath);
+                albumImg.alt = albumData.albumName;
+                albumImg.onerror = function() {
+                    this.onerror = null;
+                    this.src = 'images/default_artwork.png';
+                    this.alt = 'Default album artwork';
+                    albumLink.title = `Artwork missing for ${albumData.albumName}`;
+                };
+
+                albumLink.appendChild(albumImg);
+                targetElement.appendChild(albumLink);
+            });
+        }
+		
+		
+		// Hamburger script:
+		
+		document.addEventListener('DOMContentLoaded', () => {
+    // --- Hamburger Menu Toggle ---
+    const hamburgerButton = document.getElementById('hamburger-icon');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (hamburgerButton && mobileMenu) {
+        hamburgerButton.addEventListener('click', () => {
+            const isOpen = mobileMenu.classList.toggle('open');
+            hamburgerButton.classList.toggle('active'); // Toggle X animation
+            hamburgerButton.setAttribute('aria-expanded', isOpen);
+            mobileMenu.setAttribute('aria-hidden', !isOpen);
+            // Optional: Prevent body scroll when menu is open
+            document.body.classList.toggle('mobile-menu-active', isOpen);
+        });
+
+        // Optional: Close menu when a link is clicked
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+                hamburgerButton.classList.remove('active');
+                hamburgerButton.setAttribute('aria-expanded', 'false');
+                mobileMenu.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('mobile-menu-active');
+            });
+        });
+
+         // Optional: Close menu when clicking outside of it
+         document.addEventListener('click', (event) => {
+             // Check if menu is open and click was outside menu and outside hamburger
+             if (mobileMenu.classList.contains('open') &&
+                 !mobileMenu.contains(event.target) &&
+                 !hamburgerButton.contains(event.target)) {
+
+                 mobileMenu.classList.remove('open');
+                 hamburgerButton.classList.remove('active');
+                 hamburgerButton.setAttribute('aria-expanded', 'false');
+                 mobileMenu.setAttribute('aria-hidden', 'true');
+                 document.body.classList.remove('mobile-menu-active');
+             }
+         });
+
+
+    } else {
+        console.warn("Hamburger button or mobile menu element not found.");
+    }
+
+    // --- Keep your existing Initial Load Logic ---
+    // (Active link logic, loadMusicData, search calls etc.)
+     // Ensure event listeners target the correct elements now inside #search-controls
+     const searchInput = document.getElementById('search-input');
+     const sortSelect = document.getElementById('sort-select');
+
+     if (searchInput) { searchInput.addEventListener('input', search); }
+     if (sortSelect) { sortSelect.addEventListener('change', sortAndDisplayResults); }
+
+
+     // Active link logic (applies to #menu-panel AND potentially #mobile-menu if needed)
+     const desktopLinks = document.querySelectorAll('#menu-panel ul li a');
+     const mobileLinks = document.querySelectorAll('#mobile-menu ul li a');
+     const currentPath = window.location.pathname.split('/').pop();
+     const currentPageFile = currentPath === '' ? 'index.html' : currentPath;
+
+     const setActive = (links) => {
+          links.forEach(link => {
+              link.classList.toggle('active', link.getAttribute('href') === currentPageFile);
+          });
+     }
+     setActive(desktopLinks);
+     setActive(mobileLinks); // Apply active state to mobile menu too
+
+
+     // Load data and perform initial display (Search.html)
+     if (document.getElementById('results')) { // Only run data load/search on search page
+         const urlParams = new URLSearchParams(window.location.search);
+         const albumQuery = urlParams.get('album');
+
+         loadMusicData().then(() => {
+             if (albumQuery) {
+                 const decodedAlbumQuery = decodeURIComponent(albumQuery);
+                 console.log(`Searching for album from URL: ${decodedAlbumQuery}`);
+                 if(searchInput) { searchInput.value = `Album: "${decodedAlbumQuery}"`; }
+                 currentResults = mainMusicData.filter(track => track.Album === decodedAlbumQuery);
+                 currentPage = 1;
+                 sortAndDisplayResults();
+             } else {
+                 console.log('Initial display (showing all results)...');
+                 search();
+             }
+         });
+     }
+     // Load data for Homepage (index.html)
+     else if (document.getElementById('album-row-1')) {
+         loadFeaturedAlbums(); // Make sure this function exists if called here
+     }
+
+}); // End DOMContentLoaded
+
+
+    </script>
+
+</body>
+</html>
