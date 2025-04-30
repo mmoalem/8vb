@@ -115,74 +115,89 @@ function applyStaticTranslations() {
 
 // Function to switch the language and redirect the user
 function setLanguage(lang) {
-    console.log("Common.js: setLanguage called for language:", lang);
-    console.log("Current URL:", window.location.href);
-    console.log("Current pathname:", window.location.pathname);
-
     const recognizedLanguages = ['en', 'fr', 'de', 'es', 'it'];
     if (!recognizedLanguages.includes(lang)) {
         console.error(`Common.js: Attempted to switch to an unrecognized language: ${lang}`);
         return; // Ignore unrecognized languages
     }
 
+    // Get the current language determined earlier (assuming getCurrentLanguageFromPath ran)
+    const currentLang = window.getCurrentLanguage ? window.getCurrentLanguage() : getCurrentLanguageFromPath(); // Ensure currentLang is available
+
     if (lang === currentLang) {
         console.log(`Common.js: Already in language: ${lang}`);
         return; // Do nothing if already in the target language
     }
 
-    // Extract the current page and potential base path
-    let basePath = ''; // Default empty string for no base path
-    let currentPage = ''; // Will hold the current page (e.g., 'contact.html')
-    let currentLangSegment = ''; // Will hold current language segment if any
+    const currentPath = window.location.pathname; // e.g., /contact or /fr/contact.html or /
+    const pathSegments = currentPath.split('/').filter(Boolean); // Remove empty segments
 
-    const pathSegments = window.location.pathname.split('/').filter(segment => segment !== '');
-    
-    // First determine if we have a base path and/or language segment
-    let startIndex = 0;
-    
-    // Check for base path (not a language code)
-    if (pathSegments.length > 0 && !recognizedLanguages.includes(pathSegments[0])) {
-        basePath = '/' + pathSegments[0];
-        startIndex = 1;
+    // Determine current page filename more robustly
+    let currentPageFilename = 'index.html'; // Default to index.html
+
+    if (currentPath === '/' || currentPath.endsWith('/index.html')) {
+         currentPageFilename = 'index.html';
+    } else if (pathSegments.length > 0) {
+        const lastSegment = pathSegments[pathSegments.length - 1];
+
+        // Check if the last segment itself is a language code (e.g., /fr -> index.html)
+        if (lastSegment.length === 2 && recognizedLanguages.includes(lastSegment)) {
+            currentPageFilename = 'index.html';
+        }
+        // Check if the segment *before* the last one is a language code (e.g., /fr/contact.html or /fr/contact)
+        else if (pathSegments.length > 1 && pathSegments[pathSegments.length - 2].length === 2 && recognizedLanguages.includes(pathSegments[pathSegments.length - 2])) {
+             if (lastSegment.includes('.')) {
+                 currentPageFilename = lastSegment; // Has extension (e.g., contact.html)
+             } else if (lastSegment) {
+                 currentPageFilename = lastSegment + '.html'; // Assume .html for extensionless (e.g., contact -> contact.html)
+             }
+        }
+        // Check if we are in the root (English) path
+        else if (!(pathSegments[0].length === 2 && recognizedLanguages.includes(pathSegments[0]))) {
+             if (lastSegment.includes('.')) {
+                 currentPageFilename = lastSegment; // Has extension (e.g., /contact.html)
+             } else if (lastSegment) {
+                 currentPageFilename = lastSegment + '.html'; // Assume .html for extensionless (e.g., /contact -> contact.html)
+             }
+        }
+        // Add any other specific cases or fallbacks if needed
     }
-    
-    // Check for language segment
-    if (pathSegments.length > startIndex && recognizedLanguages.includes(pathSegments[startIndex])) {
-        currentLangSegment = pathSegments[startIndex];
-        startIndex++;
-    }
-    
-    // The remaining segments are the page path
-    if (pathSegments.length > startIndex) {
-        currentPage = pathSegments.slice(startIndex).join('/');
-    } else {
-        // Default to index.html if no page specified
-        currentPage = 'index.html';
-    }
-    
-    // If currentPage doesn't end with .html (e.g., directory), append index.html
-    if (!currentPage.includes('.')) {
-        currentPage = currentPage.replace(/\/$/, '') + '/index.html';
-    }
-    
-    console.log(`Common.js: Base path: "${basePath}", Language segment: "${currentLangSegment}", Current page: "${currentPage}"`);
-    
-    // Construct new URL 
+
+    console.log(`Common.js: Current path: ${currentPath}`);
+    console.log(`Common.js: Determined page filename: ${currentPageFilename}`);
+
+    // Construct the new URL based on target language
     let newPath;
-    
     if (lang === 'en') {
-        // For English, use root directory + page
-        newPath = `${basePath}/${currentPage}`;
+        // For English, navigate to the root directory + filename
+        newPath = `/${currentPageFilename}`;
     } else {
-        // For other languages, use language subdirectory + page
-        newPath = `${basePath}/${lang}/${currentPage}`;
+        // For other languages, navigate to language subdirectory + filename
+        newPath = `/${lang}/${currentPageFilename}`;
     }
-    
-    // Clean up double slashes that might have been introduced
-    newPath = newPath.replace(/\/+/g, '/');
-    
-    console.log(`Common.js: Redirecting to: ${newPath}`);
-    
+
+    // Basic check for potential base path (if the first segment wasn't a language code)
+    // This assumes a simple, single-directory base path like /foldername/
+    // Avoid complex base path logic unless absolutely necessary, as it can be fragile.
+    if (pathSegments.length > 0 && !(pathSegments[0].length === 2 && recognizedLanguages.includes(pathSegments[0])) && currentPath.startsWith('/') && pathSegments[0] !== currentPageFilename.replace('.html','')) {
+         // Simple check: if the first segment exists, isn't a language, and isn't the page name itself, assume it's a base path.
+         // Example: /base/contact.html -> basePath = /base
+         // Example: /contact.html -> No base path here
+         // Example: /base/fr/contact.html -> Handled by language check earlier, no base path prepended here.
+         // Note: This simple check might need adjustment based on your exact deployment structure if you use a base path.
+         // const potentialBasePath = `/${pathSegments[0]}`;
+         // newPath = potentialBasePath + newPath; // Prepend detected base path
+         // --> Commenting out base path logic for now as it might complicate things.
+         // --> The goal is root /file.html or /lang/file.html
+         console.log(`Common.js: Potential base path segment detected ('${pathSegments[0]}') but not prepended.`);
+    }
+
+
+    // Ensure no double slashes in the final path (except after origin)
+    newPath = newPath.replace(/\/{2,}/g, '/');
+
+    console.log(`Common.js: Redirecting to: ${window.location.origin}${newPath}`);
+
     // Redirect to the new URL
     window.location.href = window.location.origin + newPath;
 }
