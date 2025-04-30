@@ -132,6 +132,7 @@ function setLanguage(lang) {
     let basePathSegments = [];
     let langSegmentIndex = -1;
     let pageSegments = [];
+    let currentPageName = '';
 
     // --- Identify Base Path, Language, and Page Segments ---
     // First, check if any segment is a language code
@@ -158,6 +159,7 @@ function setLanguage(lang) {
             if (lastSegment.includes('.')) {
                 basePathSegments = pathSegments.slice(0, pathSegments.length - 1);
                 pageSegments = [lastSegment];
+                currentPageName = lastSegment; // Store the current page name
             } else {
                 // If the last segment doesn't look like a file, it might be a directory
                 basePathSegments = pathSegments;
@@ -169,8 +171,21 @@ function setLanguage(lang) {
     // --- Reconstruct Paths ---
     // Base path (e.g., / or /8vbtest/)
     const basePath = basePathSegments.length > 0 ? '/' + basePathSegments.join('/') + '/' : '/';
-    // Page path (e.g., search.html or folder/page.html)
-    const pagePath = pageSegments.join('/');
+    
+    // Get the page name (e.g., search.html, contact.html)
+    let pagePath = '';
+    if (pageSegments.length > 0) {
+        pagePath = pageSegments.join('/');
+    } else if (currentPageName) {
+        // If we're on a root page (like /search.html), use that page name
+        pagePath = currentPageName;
+    } else if (currentPagePath.endsWith('/')) {
+        // If we're on a directory path ending with /, assume index.html
+        pagePath = 'index.html';
+    } else {
+        // Default to index.html if we can't determine the page
+        pagePath = 'index.html';
+    }
 
     // --- Construct the New Path ---
     let newPath = basePath; // Start with the base path
