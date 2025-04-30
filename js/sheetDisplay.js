@@ -66,7 +66,7 @@ function displayTSVData(tsvData) {
         const headers = rows[0].split('\t');
         
         // Filter columns - specify which columns you want to display
-        const columnsToShow = [11, 86, 87, 31, 47, 66, 68, 69, 3, 1]; // Your selected columns
+        const columnsToShow = [11, 86, 87, 31, 47, 66, 68, 69, 3, 15, 1]; // Your selected columns
         
         // Create a sticky header
         tableHtml += '<thead style="position: sticky; top: 0; z-index: 1;"><tr>';
