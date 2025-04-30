@@ -115,57 +115,89 @@ function applyStaticTranslations() {
 
 // Function to switch the language and redirect the user
 function setLanguage(lang) {
-
-    console.log("Current URL:", window.location.href);
-console.log("Current pathname:", window.location.pathname);
-console.log("Current page:", window.location.pathname.split('/').pop());
-
     const recognizedLanguages = ['en', 'fr', 'de', 'es', 'it'];
     if (!recognizedLanguages.includes(lang)) {
         console.error(`Common.js: Attempted to switch to an unrecognized language: ${lang}`);
         return; // Ignore unrecognized languages
     }
 
+    // Get the current language determined earlier (assuming getCurrentLanguageFromPath ran)
+    const currentLang = window.getCurrentLanguage ? window.getCurrentLanguage() : getCurrentLanguageFromPath(); // Ensure currentLang is available
+
     if (lang === currentLang) {
         console.log(`Common.js: Already in language: ${lang}`);
         return; // Do nothing if already in the target language
     }
 
-    // Get the current URL path
-    const currentPath = window.location.pathname;
+    const currentPath = window.location.pathname; // e.g., /contact or /fr/contact.html or /
+    const pathSegments = currentPath.split('/').filter(Boolean); // Remove empty segments
+
+    // Determine current page filename more robustly
+    let currentPageFilename = 'index.html'; // Default to index.html
+
+    if (currentPath === '/' || currentPath.endsWith('/index.html')) {
+         currentPageFilename = 'index.html';
+    } else if (pathSegments.length > 0) {
+        const lastSegment = pathSegments[pathSegments.length - 1];
+
+        // Check if the last segment itself is a language code (e.g., /fr -> index.html)
+        if (lastSegment.length === 2 && recognizedLanguages.includes(lastSegment)) {
+            currentPageFilename = 'index.html';
+        }
+        // Check if the segment *before* the last one is a language code (e.g., /fr/contact.html or /fr/contact)
+        else if (pathSegments.length > 1 && pathSegments[pathSegments.length - 2].length === 2 && recognizedLanguages.includes(pathSegments[pathSegments.length - 2])) {
+             if (lastSegment.includes('.')) {
+                 currentPageFilename = lastSegment; // Has extension (e.g., contact.html)
+             } else if (lastSegment) {
+                 currentPageFilename = lastSegment + '.html'; // Assume .html for extensionless (e.g., contact -> contact.html)
+             }
+        }
+        // Check if we are in the root (English) path
+        else if (!(pathSegments[0].length === 2 && recognizedLanguages.includes(pathSegments[0]))) {
+             if (lastSegment.includes('.')) {
+                 currentPageFilename = lastSegment; // Has extension (e.g., /contact.html)
+             } else if (lastSegment) {
+                 currentPageFilename = lastSegment + '.html'; // Assume .html for extensionless (e.g., /contact -> contact.html)
+             }
+        }
+        // Add any other specific cases or fallbacks if needed
+    }
+
     console.log(`Common.js: Current path: ${currentPath}`);
-    
-    // Extract the current page filename
-    const pathParts = currentPath.split('/');
-    let currentPage = pathParts[pathParts.length - 1];
-    
-    // If empty (directory path), default to index.html
-    if (!currentPage || currentPage === '') {
-        currentPage = 'index.html';
-    }
-    
-    console.log(`Common.js: Current page: ${currentPage}`);
-    
-    // Construct the new URL based on language
+    console.log(`Common.js: Determined page filename: ${currentPageFilename}`);
+
+    // Construct the new URL based on target language
     let newPath;
-    
     if (lang === 'en') {
-        // For English, use the root directory
-        newPath = `/${currentPage}`;
+        // For English, navigate to the root directory + filename
+        newPath = `/${currentPageFilename}`;
     } else {
-        // For other languages, use language subdirectory
-        newPath = `/${lang}/${currentPage}`;
+        // For other languages, navigate to language subdirectory + filename
+        newPath = `/${lang}/${currentPageFilename}`;
     }
-    
-    // Handle base path if site is in a subdirectory
-    const basePath = window.location.pathname.match(/^\/[^\/]+\//);
-    if (basePath) {
-        // Site is in a subdirectory (e.g., /8vbMusic/)
-        newPath = basePath[0] + newPath.substring(1);
+
+    // Basic check for potential base path (if the first segment wasn't a language code)
+    // This assumes a simple, single-directory base path like /foldername/
+    // Avoid complex base path logic unless absolutely necessary, as it can be fragile.
+    if (pathSegments.length > 0 && !(pathSegments[0].length === 2 && recognizedLanguages.includes(pathSegments[0])) && currentPath.startsWith('/') && pathSegments[0] !== currentPageFilename.replace('.html','')) {
+         // Simple check: if the first segment exists, isn't a language, and isn't the page name itself, assume it's a base path.
+         // Example: /base/contact.html -> basePath = /base
+         // Example: /contact.html -> No base path here
+         // Example: /base/fr/contact.html -> Handled by language check earlier, no base path prepended here.
+         // Note: This simple check might need adjustment based on your exact deployment structure if you use a base path.
+         // const potentialBasePath = `/${pathSegments[0]}`;
+         // newPath = potentialBasePath + newPath; // Prepend detected base path
+         // --> Commenting out base path logic for now as it might complicate things.
+         // --> The goal is root /file.html or /lang/file.html
+         console.log(`Common.js: Potential base path segment detected ('${pathSegments[0]}') but not prepended.`);
     }
-    
-    console.log(`Common.js: Redirecting to: ${newPath}`);
-    
+
+
+    // Ensure no double slashes in the final path (except after origin)
+    newPath = newPath.replace(/\/{2,}/g, '/');
+
+    console.log(`Common.js: Redirecting to: ${window.location.origin}${newPath}`);
+
     // Redirect to the new URL
     window.location.href = window.location.origin + newPath;
 }
