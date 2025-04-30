@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Metadata Translation App (Fixed)</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="p-8 max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center">Music Metadata Translation App (Fixed)</h1>
+
+        <div id="errorContainer" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 hidden"></div>
+
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">1. Translation Settings</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Target Language:</label>
+                    <select id="targetLanguage" class="w-full p-2 border rounded">
+                        <option value="fr">French</option>
+                        <option value="es">Spanish</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                        <option value="ja">Japanese</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">API Key (Bearer Token):</label>
+                    <input type="password" id="apiKey" class="w-full p-2 border rounded" placeholder="Enter API key">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Translation Endpoint:</label>
+                    <input type="text" id="translationEndpoint" class="w-full p-2 border rounded"
+                           value="http://localhost:5000/translate"
+                           placeholder="http://localhost:5000/translate">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Delay Between Terms (ms):</label>
+                    <input type="number" id="termDelay" class="w-full p-2 border rounded"
+                           value="200" placeholder="200" min="0" max="5000">
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">2. Load Input JSON File</h2>
+            <input type="file" id="jsonFileInput" accept=".json" class="mb-2">
+            <textarea id="inputJson" class="w-full h-64 p-2 border rounded font-mono text-sm"
+                      placeholder="Paste your JSON here or upload a file"></textarea>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">3. Dictionary Management</h2>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <button id="saveDictionary" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Save Dictionary
+                </button>
+                <button id="exportDictionary" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Export Dictionary
+                </button>
+                <button id="cleanupDictionary" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                    Clean Dictionary
+                </button>
+                <input type="file" id="dictionaryFileInput" accept=".json" class="py-2">
+            </div>
+
+            <div id="savedDictionariesContainer" class="hidden">
+                <h3 class="font-semibold mb-1">Load Saved Dictionary:</h3>
+                <div id="savedDictionariesButtons" class="flex flex-wrap gap-2"></div>
+            </div>
+        </div>
+
+        <div id="progressContainer" class="mb-6 hidden">
+            <h2 class="text-xl font-semibold mb-2">Translation Progress</h2>
+            <div class="bg-gray-200 h-4 rounded-full overflow-hidden">
+                <div id="progressBar" class="bg-blue-600 h-full transition-all duration-300 ease-in-out" style="width: 0%"></div>
+            </div>
+            <div class="mt-2 flex justify-between text-sm text-gray-600">
+                <div id="progressText">
+                    <span class="font-medium" id="currentTrack">0</span> of
+                    <span class="font-medium" id="totalTracks">0</span> tracks processed
+                    <span id="currentFieldText"></span>
+                    <span id="currentTermText"></span>
+                </div>
+                <div id="estimatedTimeRemaining"></div>
+            </div>
+            <div id="translationLog" class="mt-4 p-2 bg-gray-100 rounded text-xs font-mono h-32 overflow-y-auto"></div>
+        </div>
+
+        <div class="mb-6">
+            <button id="translateButton" class="w-full py-3 px-4 rounded font-bold bg-blue-600 hover:bg-blue-700 text-white">
+                Translate JSON
+            </button>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">4. Output JSON</h2>
+            <textarea id="outputJson" readonly class="w-full h-64 p-2 border rounded font-mono text-sm"
+                      placeholder="Translated JSON will appear here"></textarea>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">Current Translation Dictionary (<span id="dictionaryCount">0</span> entries)</h2>
+            <div class="bg-gray-100 p-4 rounded max-h-64 overflow-y-auto">
+                <table id="dictionaryTable" class="w-full text-sm hidden">
+                    <thead>
+                        <tr class="text-left border-b">
+                            <th class="pb-2">Original Term (English)</th>
+                            <th class="pb-2">Translated (<span id="dictionaryTargetLang">fr</span>)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dictionaryTableBody"></tbody>
+                </table>
+                <p id="noDictionaryText">No translations in dictionary yet</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application state
+        const state = {
+            inputJson: "",
+            outputJson: "",
+            targetLanguage: "fr",
+            isTranslating: false,
+            dictionary: {}, // Stores ONLY individual term translations: { "term_lang": "translation" }
+            savedDictionaries: {},
+            error: "",
+            apiKey: "",
+            translationEndpoint: "http://localhost:5000/translate",
+            termDelay: 200, // Delay between translating individual terms
+            progress: 0,
+            totalTracks: 0,
+            currentTrack: 0,
+            currentField: "",
+            currentTermIndex: 0,
+            totalTermsInField: 0,
+            translationStartTime: null,
+            totalTermsToTranslate: 0, // Estimate total terms across all tracks/fields
+            termsTranslatedCount: 0   // Count terms actually translated (cache hits + API calls)
+        };
+
+        // Fields to translate
+        const fieldsToTranslate = [
+            "KEYWORD/TAGS",
+            "MOOD",
+            "GENRE",
+            "TEMPO",
+            "Version",
+            "INSTRUMENTS",
+            "Album"
+        ];
+
+        // Helper function to parse terms
+        const parseTerms = (text) => {
+            if (!text || typeof text !== 'string') return [];
+            // Split by common separators (comma, slash, semicolon)
+            // Also handle cases like "dark, tense, " where there might be trailing separators
+            return text
+                .split(/[,\/;]/)
+                .map(term => term.trim())
+                .filter(term => term.length > 0);
+        };
+
+        // Simple delay function
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // Function to log translation progress
+        const logTranslation = (message) => {
+            const logElement = document.getElementById('translationLog');
+            const entry = document.createElement('div');
+            entry.textContent = message;
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight;
+        };
+
+        // --- Translation Logic ---
+
+        // Handles the actual API call for a SINGLE term
+        const _translateTermApi = async (term, targetLang, retries = 3) => {
+            logTranslation(`API Call: Translating term "${term}" to ${targetLang}`);
+            state.termsTranslatedCount++; // Increment count for API call attempts
+
+            const libreLangMap = { fr: "fr", es: "es", de: "de", it: "it", ja: "ja" };
+            const libreTargetLang = libreLangMap[targetLang] || targetLang;
+
+            for (let attempt = 0; attempt < retries; attempt++) {
+                try {
+                    await delay(state.termDelay); // Apply delay before each API attempt
+
+                    const response = await fetch(state.translationEndpoint, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${state.apiKey}`
+                        },
+                        body: JSON.stringify({
+                            q: term,
+                            source: "en",
+                            target: libreTargetLang,
+                            format: "text"
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.translatedText) {
+                        logTranslation(` -> Success: "${term}" → "${data.translatedText}"`);
+                        return data.translatedText;
+                    } else {
+                        const errorMsg = data.error || `HTTP ${response.status}`;
+                        console.error(`Translation error (attempt ${attempt + 1}/${retries}) for "${term}":`, errorMsg, data);
+                        logTranslation(` -> Error (${attempt + 1}/${retries}): Failed for "${term}" - ${errorMsg}`);
+                        // Wait longer between retries (exponential backoff)
+                        await delay(state.termDelay * Math.pow(2, attempt));
+                    }
+                } catch (err) {
+                    console.error(`Translation error (attempt ${attempt + 1}/${retries}) for "${term}":`, err);
+                    logTranslation(` -> Error (${attempt + 1}/${retries}): Network/Fetch failed for "${term}" - ${err.message}`);
+                    await delay(state.termDelay * Math.pow(2, attempt));
+                }
+            }
+
+            logTranslation(`❌ All ${retries} translation attempts failed for term: "${term}"`);
+            return term; // Return original term on final failure
+        };
+
+        // Main function to get translation for a text string (handles splitting, caching, API calls)
+        const translateText = async (text, targetLang) => {
+            if (!text || typeof text !== 'string') return "";
+
+            const terms = parseTerms(text);
+            if (terms.length === 0) return "";
+
+            const translatedTerms = [];
+            state.totalTermsInField = terms.length;
+
+            for (let i = 0; i < terms.length; i++) {
+                const term = terms[i];
+                state.currentTermIndex = i + 1;
+                updateProgressUI(); // Update UI for term progress
+
+                // Convert term to lowercase for dictionary lookup and storage
+                const lowerCaseTerm = term.toLowerCase();
+                const dictKey = `${lowerCaseTerm}_${targetLang}`; // Use lowercase term for the key
+
+                if (state.dictionary[dictKey]) {
+                    logTranslation(`Cache hit (case-insensitive): "${term}" → "${state.dictionary[dictKey]}"`);
+                    translatedTerms.push(state.dictionary[dictKey]);
+                    // Increment terms count even for cache hits for progress calculation
+                    state.termsTranslatedCount++;
+                    // Update progress after each term (even dictionary hits)
+                    state.progress = state.totalTermsToTranslate > 0 ? (state.termsTranslatedCount / state.totalTermsToTranslate) * 100 : 0;
+                    updateProgressUI();
+                } else {
+                    const translatedTerm = await _translateTermApi(term, targetLang); // Still translate the original term
+                    // IMPORTANT: Store the translation (or original term if failed) in the dictionary using the LOWERCASE key
+                    state.dictionary[dictKey] = translatedTerm; // Use the lowercase dictKey here
+                    translatedTerms.push(translatedTerm);
+                    // Update dictionary table *during* translation to show progress
+                    updateDictionaryTable();
+                }
+            }
+
+            // Reset term progress for the next field
+            state.currentTermIndex = 0;
+            state.totalTermsInField = 0;
+
+            return translatedTerms.join(', '); // Reconstruct the string
+        };
+
+        // --- JSON Processing ---
+
+        const processJson = async () => {
+            setError("");
+            if (!state.apiKey) {
+                setError("API Key is required.");
+                return;
+            }
+             if (!state.inputJson) {
+                setError("Input JSON is required.");
+                return;
+            }
+
+            state.isTranslating = true;
+            state.translationStartTime = Date.now();
+            state.termsTranslatedCount = 0; // Reset count
+            updateUI();
+
+            try {
+                const data = JSON.parse(state.inputJson);
+                if (!Array.isArray(data)) {
+                     setError("Input JSON must be an array of objects.");
+                     state.isTranslating = false;
+                     updateUI();
+                     return;
+                }
+
+
+                state.totalTracks = data.length;
+                state.currentTrack = 0;
+                state.currentField = "";
+                state.progress = 0;
+
+                // Estimate total terms for progress calculation (rough estimate)
+                state.totalTermsToTranslate = 0;
+                data.forEach(track => {
+                    fieldsToTranslate.forEach(field => {
+                        if (track[field] && typeof track[field] === 'string') {
+                            state.totalTermsToTranslate += parseTerms(track[field]).length;
+                        } else if (track[field] && typeof track[field] === 'object' && track[field].en && !track[field][state.targetLanguage]) {
+                             state.totalTermsToTranslate += parseTerms(track[field].en).length;
+                        }
+                    });
+                });
+                logTranslation(`Estimated total terms to process: ${state.totalTermsToTranslate}`);
+
+
+                updateProgressUI();
+                document.getElementById('translationLog').innerHTML = '';
+
+                // Use a copy for this session, but update the main state dictionary directly
+                // state.dictionary will accumulate results during the process
+                const translatedData = [];
+
+                for (let i = 0; i < data.length; i++) {
+                    const track = data[i];
+                    state.currentTrack = i + 1;
+                    logTranslation(`--- Processing track ${i + 1}/${data.length}: "${track['Track Name'] || 'Unnamed Track'}" ---`);
+
+                    const translatedTrack = { ...track };
+
+                    for (let j = 0; j < fieldsToTranslate.length; j++) {
+                        const field = fieldsToTranslate[j];
+                        state.currentField = field;
+                        state.currentTermIndex = 0; // Reset term index for new field
+                        state.totalTermsInField = 0; // Reset term count for new field
+                        updateProgressUI(); // Update UI to show current field
+
+
+                        let originalText = null;
+                        if (track[field]) {
+                             if (typeof track[field] === 'string') {
+                                originalText = track[field];
+                            } else if (typeof track[field] === 'object' && track[field].en && !track[field][state.targetLanguage]) {
+                                // Only translate if the target language is missing
+                                originalText = track[field].en;
+                            } else if (typeof track[field] === 'object' && track[field].en && track[field][state.targetLanguage]) {
+                                // Already translated, skip API call but ensure structure
+                                originalText = track[field].en;
+                                translatedTrack[field] = { ...track[field] }; // Keep existing structure
+                                logTranslation(`Field "${field}" already translated, skipping.`);
+                                originalText = null; // Prevent translation call
+                            }
+                        }
+
+
+                        if (originalText) {
+                             logTranslation(`Translating field "${field}"...`);
+                             const translated = await translateText(originalText, state.targetLanguage);
+
+                              // Convert forward slashes to commas in the English version too
+                              const normalizedEnglish = parseTerms(originalText).join(', ');
+
+                             // Always create/update the object structure
+                             translatedTrack[field] = {
+                                 ...(typeof track[field] === 'object' ? track[field] : {}), // Preserve existing keys if object
+                                 en: normalizedEnglish, // Store normalized English with commas
+                                 [state.targetLanguage]: translated
+                             };
+                        }
+
+                        // Update overall progress based on terms translated so far
+                         state.progress = state.totalTermsToTranslate > 0 ? (state.termsTranslatedCount / state.totalTermsToTranslate) * 100 : 0;
+                         updateProgressUI(); // Update progress after field processing
+                    }
+
+                    translatedData.push(translatedTrack);
+                    // No delay needed here as delay is per term now
+                     // await delay(state.batchDelay); // Removed track delay
+                }
+
+
+                state.outputJson = JSON.stringify(translatedData, null, 2);
+                state.progress = 100; // Set to 100% explicitly at the end
+                updateUI();
+                updateDictionaryTable(); // Final dictionary table update
+                logTranslation(`✅ Translation completed. Processed ${data.length} tracks. Dictionary has ${Object.keys(state.dictionary).length} term entries.`);
+
+            } catch (err) {
+                console.error("Processing error:", err);
+                setError(`Error processing JSON: ${err.message}. Check console for details.`);
+                logTranslation(`❌ Error processing JSON: ${err.message}`);
+            } finally {
+                state.isTranslating = false;
+                updateUI();
+            }
+        };
+
+
+        // --- Dictionary Management ---
+
+        const saveDictionary = () => {
+            if (Object.keys(state.dictionary).length === 0) {
+                setError("No translations to save");
+                return;
+            }
+
+            // Merge with existing saved dictionary for the target language
+            const existingLangDict = state.savedDictionaries[state.targetLanguage] || {};
+            const mergedDict = { ...existingLangDict, ...state.dictionary };
+
+            const newSavedDictionaries = {
+                ...state.savedDictionaries,
+                [state.targetLanguage]: mergedDict
+            };
+
+            localStorage.setItem("translationDictionaries", JSON.stringify(newSavedDictionaries));
+            state.savedDictionaries = newSavedDictionaries;
+
+            updateSavedDictionariesButtons();
+            alert(`Dictionary for ${state.targetLanguage} saved/updated with ${Object.keys(state.dictionary).length} new/updated entries. Total entries for ${state.targetLanguage}: ${Object.keys(mergedDict).length}.`);
+        };
+
+        const loadDictionary = (lang) => {
+            if (state.savedDictionaries[lang]) {
+                // Load and merge, prioritizing loaded dictionary entries
+                 state.dictionary = { ...state.dictionary, ...state.savedDictionaries[lang] };
+                state.targetLanguage = lang;
+                document.getElementById("targetLanguage").value = lang;
+                alert(`Dictionary loaded and merged for ${lang}. Current dictionary has ${Object.keys(state.dictionary).length} entries.`);
+                updateDictionaryTable();
+                 updateUI(); // Update UI elements like target lang display
+            }
+        };
+
+        const exportDictionary = () => {
+            // Export the *current* working dictionary
+            if (Object.keys(state.dictionary).length === 0) {
+                setError("Current dictionary is empty, nothing to export.");
+                return;
+            }
+            const dictToExport = {};
+             // Filter dictionary for the current target language before exporting
+            Object.entries(state.dictionary).forEach(([key, value]) => {
+                if (key.endsWith(`_${state.targetLanguage}`)) {
+                    dictToExport[key] = value;
+                }
+            });
+
+             if (Object.keys(dictToExport).length === 0) {
+                setError(`No translations for the current language (${state.targetLanguage}) in the dictionary to export.`);
+                return;
+            }
+
+            const dataStr = JSON.stringify(dictToExport, null, 2);
+            const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+            const exportFileDefaultName = `translation_dictionary_${state.targetLanguage}.json`;
+
+            const linkElement = document.createElement("a");
+            linkElement.setAttribute("href", dataUri);
+            linkElement.setAttribute("download", exportFileDefaultName);
+            linkElement.click();
+        };
+
+        const cleanupDictionary = () => {
+            // Clean the *current* working dictionary
+            const initialCount = Object.keys(state.dictionary).length;
+            const cleanDict = {};
+            const seenEntries = new Set(); // Track "term_lang" combination
+
+            Object.entries(state.dictionary).forEach(([key, value]) => {
+                // Basic validation: key has "_lang", term and value are not empty
+                if (!key.includes('_') || !value || typeof value !== 'string' || value.trim() === '') return;
+
+                const term = key.substring(0, key.lastIndexOf('_'));
+                 if (!term || term.trim() === '') return;
+
+                const entryKey = key.toLowerCase(); // Use lowercase key for duplicate check
+
+                if (!seenEntries.has(entryKey)) {
+                    cleanDict[key] = value; // Keep original key case
+                    seenEntries.add(entryKey);
+                }
+            });
+
+            const removedCount = initialCount - Object.keys(cleanDict).length;
+            state.dictionary = cleanDict;
+            updateDictionaryTable();
+            alert(`Dictionary cleaned up. Removed ${removedCount} invalid or duplicate entries. Current size: ${Object.keys(cleanDict).length}.`);
+        };
+
+        // --- UI Updates ---
+
+         const getEstimatedTimeRemaining = () => {
+            if (!state.isTranslating || state.termsTranslatedCount === 0 || state.totalTermsToTranslate === 0) return "";
+
+            const elapsedMs = Date.now() - state.translationStartTime;
+            const progressRatio = state.termsTranslatedCount / state.totalTermsToTranslate;
+
+            if (progressRatio > 0 && progressRatio <= 1) {
+                const estimatedTotalMs = elapsedMs / progressRatio;
+                const remainingMs = Math.max(0, estimatedTotalMs - elapsedMs); // Ensure non-negative
+
+                if (remainingMs < 1000) return "Less than a second remaining";
+                if (remainingMs < 60000) return `About ${Math.ceil(remainingMs / 1000)} sec remaining`;
+                if (remainingMs < 3600000) return `About ${Math.ceil(remainingMs / 60000)} min remaining`;
+
+                const hours = Math.floor(remainingMs / 3600000);
+                const minutes = Math.ceil((remainingMs % 3600000) / 60000);
+                return `About ${hours} hr ${minutes} min remaining`;
+            }
+
+            return ""; // Should not happen if counts are correct
+        };
+
+
+        function updateUI() {
+            document.getElementById("inputJson").value = state.inputJson;
+            document.getElementById("outputJson").value = state.outputJson;
+            document.getElementById("targetLanguage").value = state.targetLanguage;
+            document.getElementById("apiKey").value = state.apiKey;
+            document.getElementById("translationEndpoint").value = state.translationEndpoint;
+            document.getElementById("termDelay").value = state.termDelay; // Changed from batchDelay
+
+            const translateButton = document.getElementById("translateButton");
+            translateButton.disabled = state.isTranslating || !state.inputJson || !state.apiKey;
+            translateButton.textContent = state.isTranslating ? "Translating..." : "Translate JSON";
+             translateButton.className = `w-full py-3 px-4 rounded font-bold text-white ${translateButton.disabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`;
+
+
+            document.getElementById("progressContainer").classList.toggle("hidden", !state.isTranslating);
+            document.getElementById("dictionaryCount").textContent = Object.keys(state.dictionary).length;
+            document.getElementById("dictionaryTargetLang").textContent = state.targetLanguage;
+
+            const dictionaryTable = document.getElementById("dictionaryTable");
+            const noDictionaryText = document.getElementById("noDictionaryText");
+            const hasEntries = Object.keys(state.dictionary).length > 0;
+            dictionaryTable.classList.toggle("hidden", !hasEntries);
+            noDictionaryText.classList.toggle("hidden", hasEntries);
+        }
+
+        function updateProgressUI() {
+            if (state.isTranslating) {
+                 // Calculate progress based on terms processed relative to estimated total
+                 const estimatedProgress = state.totalTermsToTranslate > 0 ? (state.termsTranslatedCount / state.totalTermsToTranslate) * 100 : 0;
+                 // Ensure progress doesn't exceed 100 and clamp between 0 and 100
+                 const displayProgress = Math.min(100, Math.max(0, estimatedProgress));
+                document.getElementById("progressBar").style.width = `${displayProgress}%`;
+                document.getElementById("currentTrack").textContent = state.currentTrack;
+                document.getElementById("totalTracks").textContent = state.totalTracks;
+
+                const fieldText = state.currentField ? ` (Field: ${state.currentField})` : "";
+                document.getElementById("currentFieldText").textContent = fieldText;
+
+                const termText = state.totalTermsInField > 0 ? ` (Term: ${state.currentTermIndex}/${state.totalTermsInField})` : "";
+                document.getElementById("currentTermText").textContent = termText;
+
+                 document.getElementById("estimatedTimeRemaining").textContent = getEstimatedTimeRemaining();
+            }
+        }
+
+
+        function updateDictionaryTable() {
+            const tableBody = document.getElementById("dictionaryTableBody");
+            tableBody.innerHTML = ""; // Clear existing rows
+
+            // Get entries for the current language and sort alphabetically by original term
+            const currentLangEntries = Object.entries(state.dictionary)
+                .filter(([key]) => key.endsWith(`_${state.targetLanguage}`))
+                .sort(([keyA], [keyB]) => {
+                     const termA = keyA.substring(0, keyA.lastIndexOf(`_${state.targetLanguage}`)).toLowerCase();
+                     const termB = keyB.substring(0, keyB.lastIndexOf(`_${state.targetLanguage}`)).toLowerCase();
+                    return termA.localeCompare(termB);
+                });
+
+
+            currentLangEntries.forEach(([key, value]) => {
+                const originalTerm = key.substring(0, key.lastIndexOf(`_${state.targetLanguage}`));
+                const row = document.createElement("tr");
+                row.className = "border-b border-gray-200";
+
+                const originalCell = document.createElement("td");
+                originalCell.className = "py-1 pr-4";
+                originalCell.textContent = originalTerm;
+
+                const translatedCell = document.createElement("td");
+                translatedCell.className = "py-1";
+                translatedCell.textContent = value;
+
+                row.appendChild(originalCell);
+                row.appendChild(translatedCell);
+                tableBody.appendChild(row);
+            });
+
+             // Update overall UI (counts, visibility)
+             document.getElementById("dictionaryCount").textContent = currentLangEntries.length; // Show count for current lang
+             document.getElementById("dictionaryTargetLang").textContent = state.targetLanguage;
+             const hasEntries = currentLangEntries.length > 0;
+             document.getElementById("dictionaryTable").classList.toggle("hidden", !hasEntries);
+             document.getElementById("noDictionaryText").classList.toggle("hidden", hasEntries);
+        }
+
+
+        function updateSavedDictionariesButtons() {
+            const container = document.getElementById("savedDictionariesContainer");
+            const buttonsContainer = document.getElementById("savedDictionariesButtons");
+            buttonsContainer.innerHTML = "";
+
+            const languages = Object.keys(state.savedDictionaries).sort(); // Sort languages alphabetically
+            if (languages.length > 0) {
+                container.classList.remove("hidden");
+                languages.forEach(lang => {
+                    const button = document.createElement("button");
+                    button.className = "bg-gray-200 hover:bg-gray-300 py-1 px-3 rounded text-sm";
+                    // Show count of terms for that language
+                    const count = Object.keys(state.savedDictionaries[lang]).length;
+                    button.textContent = `${lang} (${count})`;
+                    button.onclick = () => loadDictionary(lang);
+                    buttonsContainer.appendChild(button);
+                });
+            } else {
+                container.classList.add("hidden");
+            }
+        }
+
+        function setError(message) {
+            state.error = message;
+            const errorContainer = document.getElementById("errorContainer");
+            errorContainer.textContent = message;
+            errorContainer.classList.toggle("hidden", !message);
+        }
+
+
+        // --- Initialization ---
+
+        function initializeApp() {
+            // Load saved dictionaries
+            const saved = localStorage.getItem("translationDictionaries");
+            if (saved) {
+                try {
+                    state.savedDictionaries = JSON.parse(saved);
+                    // Load the dictionary for the default language into the working dictionary
+                    if(state.savedDictionaries[state.targetLanguage]) {
+                        state.dictionary = { ...state.savedDictionaries[state.targetLanguage] };
+                    }
+                    updateSavedDictionariesButtons();
+                    updateDictionaryTable(); // Update table based on potentially loaded dictionary
+                } catch (e) {
+                    console.error("Failed to parse saved dictionaries", e);
+                     localStorage.removeItem("translationDictionaries"); // Clear corrupted data
+                    state.savedDictionaries = {};
+                     state.dictionary = {};
+                }
+            }
+
+            // Add event listeners
+            document.getElementById("targetLanguage").addEventListener("change", (e) => {
+                 const newLang = e.target.value;
+                 // Before changing language, offer to save current work? Or just merge?
+                 // Simple approach: Just change the target and reload/update dictionary view
+                state.targetLanguage = newLang;
+                 // Optionally load saved dictionary for the new language if available
+                 if (state.savedDictionaries[newLang]) {
+                     // Merge strategy: Keep existing entries, overwrite/add from saved
+                     state.dictionary = { ...state.dictionary, ...state.savedDictionaries[newLang] };
+                     alert(`Switched to ${newLang}. Loaded ${Object.keys(state.savedDictionaries[newLang]).length} saved entries. Current dictionary size: ${Object.keys(state.dictionary).length}`);
+                 } else {
+                     alert(`Switched to ${newLang}. No saved dictionary found for this language.`);
+                 }
+                updateDictionaryTable(); // Refresh table for the new language
+                 updateUI();
+            });
+
+            document.getElementById("apiKey").addEventListener("input", (e) => { // Use input for immediate feedback
+                state.apiKey = e.target.value;
+                updateUI(); // Re-evaluate button disabled state
+            });
+
+            document.getElementById("translationEndpoint").addEventListener("change", (e) => {
+                state.translationEndpoint = e.target.value;
+            });
+
+            document.getElementById("termDelay").addEventListener("change", (e) => { // Changed ID
+                state.termDelay = Number(e.target.value);
+            });
+
+             document.getElementById("inputJson").addEventListener("input", (e) => { // Use input event
+                state.inputJson = e.target.value;
+                updateUI(); // Update button state immediately
+            });
+
+            document.getElementById("jsonFileInput").addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        state.inputJson = event.target.result;
+                        document.getElementById("inputJson").value = state.inputJson; // Update textarea display
+                        updateUI();
+                    };
+                     reader.onerror = () => {
+                        setError("Error reading JSON file.");
+                     }
+                    reader.readAsText(file);
+                }
+            });
+
+             document.getElementById("dictionaryFileInput").addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const importedDictionary = JSON.parse(event.target.result);
+                             let importedCount = 0;
+                             // Basic validation of imported format
+                             Object.entries(importedDictionary).forEach(([key, value]) => {
+                                 // Expecting "term_lang": "translation"
+                                 if (key.includes('_') && typeof value === 'string') {
+                                     state.dictionary[key] = value; // Merge/overwrite
+                                     importedCount++;
+                                 } else {
+                                      console.warn(`Skipping invalid dictionary entry: ${key}`);
+                                 }
+                             });
+
+                            updateDictionaryTable();
+                             alert(`Dictionary imported and merged successfully. Added/updated ${importedCount} entries. Current dictionary size: ${Object.keys(state.dictionary).length}.`);
+                        } catch (err) {
+                            setError(`Invalid dictionary file or content: ${err.message}`);
+                        }
+                    };
+                     reader.onerror = () => {
+                        setError("Error reading dictionary file.");
+                     }
+                    reader.readAsText(file);
+                     // Clear the file input value so the same file can be loaded again if needed
+                     e.target.value = null;
+                }
+            });
+
+            document.getElementById("translateButton").addEventListener("click", processJson);
+            document.getElementById("saveDictionary").addEventListener("click", saveDictionary);
+            document.getElementById("exportDictionary").addEventListener("click", exportDictionary);
+            document.getElementById("cleanupDictionary").addEventListener("click", cleanupDictionary);
+
+            // Initial UI update based on loaded state
+            updateUI();
+        }
+
+        // Initialize app
+        document.addEventListener("DOMContentLoaded", initializeApp);
+    </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacter 8vb Music Production Music Library - Prenez Contact</title> <!-- Translated Title -->
+	<meta name="description" content="Vous avez des questions sur les licences, la recherche de musique ou autre chose ? Contactez la bibliothèque musicale de production 8vb Music à Londres par e-mail ou via le formulaire de contact en ligne."> <!-- Translated Description -->
+
+	<link rel="stylesheet" href="../style.css"> <!-- Link to parent directory -->
+	<!-- <link rel="stylesheet" href="/language-dropdown.css"> -->
+
+</head>
+<body class="page-contact"> <!-- Added class for potential page-specific styling -->
+    <body>
+
+    <!-- Logo Container - Fixed Top Left -->
+    <div id="logo-container">
+        <a href="./index.html"><img src="../images/logo.jpg" alt="Logo 8vb Music"></a> <!-- Added logo link -->
+    </div>
+
+
+    <!-- Top Bar - Fixed container -->
+    <div id="top-bar">
+        <!-- Inner Wrapper - Constrains content to max-width -->
+        <div class="top-bar-content-wrapper">
+
+		<!-- NEW: Group for Search and Menu -->
+            <div class="controls-group">
+
+            <!-- Search Controls - ONLY ON Search.html -->
+            <!-- Place this DIV *first* inside .top-bar-content-wrapper -->
+            <!-- This div will be ABSENT from index.html, cue-sheet-metadata.html, contact.html -->
+            <!-- Example for Search.html: -->
+            <!--
+            <div id="search-controls">
+                <input type="text" id="search-input" placeholder="Rechercher dans la Bibliothèque">
+                <div class="sort-container">
+                    <span class="sort-label">Afficher les résultats :</span>
+                    <select id="sort-select">
+                        <option value="alphabetical-asc">Alphabétiquement (A-Z)</option>
+                        <option value="alphabetical-desc">Alphabétiquement (Z-A)</option>
+                        <option value="isrc-asc">Plus Anciens d'Abord</option>
+                        <option value="isrc-desc">Plus Récents d'Abord</option>
+                        <option value="random">Ordre Aléatoire</option>
+                    </select>
+                </div>
+            </div>
+            -->
+
+            <!-- Menu Panel - Fixed -->
+     <div id="menu-panel">
+        <nav>
+            <ul>
+                <li><a href="./index.html" data-translate="navHome">Accueil</a></li> <!--{/* Translated text + data-translate */}-->
+                <li><a href="./search.html" data-translate="navSearch">Rechercher de la Musique</a></li> <!--{/* Translated text + data-translate */}-->
+                <li><a href="./cue-sheet-metadata.html" data-translate="navMetadata">Rechercher des Métadonnées</a></li> <!--{/* Translated text + data-translate */}-->
+                <li><a href="./contact.html" data-translate="navContact">Contactez-nous</a></li> <!--{/* Translated text + data-translate */}-->
+				<li><a href="./Terms.html" data-translate="navLegal">Mentions Légales</a></li> <!--{/* Translated text + data-translate */}-->
+                 <!-- Language Selector - Desktop Dropdown -->
+                <li class="language-menu-item">
+                    <span class="current-language" aria-haspopup="true" aria-expanded="false">
+                         <img src="../images/flags/fr.svg" alt="Drapeau Français" class="flag-icon"> <span data-translate="langFR">FR</span> {/* Translated text + data-translate */}
+                    </span>
+                    <ul class="language-dropdown">
+                         <li><a href="#" data-lang="en"><img src="../images/flags/gb.svg" alt="English Flag" class="flag-icon"> <span data-translate="langEN">EN</span></a></li> <!--{/* data-translate added */}-->
+                         <li><a href="#" data-lang="fr"><img src="../images/flags/fr.svg" alt="French Flag" class="flag-icon"> <span data-translate="langFR">FR</span></a></li> <!--{/* data-translate added */}-->
+                         <li><a href="#" data-lang="de"><img src="../images/flags/de.svg" alt="German Flag" class="flag-icon"> <span data-translate="langDE">DE</span></a></li>
+                         <li><a href="#" data-lang="es"><img src="../images/flags/es.svg" alt="Spanish Flag" class="flag-icon"> <span data-translate="langES">ES</span></a></li>
+                         <li><a href="#" data-lang="it"><img src="../images/flags/it.svg" alt="Italian Flag" class="flag-icon"> <span data-translate="langIT">IT</span></a></li>
+                         <!-- Add other languages here following the same pattern -->
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+			</div> <!-- End of .controls-group -->
+
+        </div> <!-- End of .top-bar-content-wrapper -->
+    </div> <!-- End of #top-bar -->
+
+<!-- Hamburger Icon Button (Mobile) -->
+    <!-- Hamburger Icon Button (Mobile) -->
+    <button id="hamburger-icon" aria-label="Toggle menu" aria-expanded="false">
+        <span></span> <!-- Line 1 -->
+        <span></span> <!-- Line 2 -->
+        <span></span> <!-- Line 3 -->
+    </button>
+
+    <!-- Mobile Menu Container -->
+    <div id="mobile-menu" aria-hidden="true">
+        <nav>
+            <ul>
+                 <!-- Link hrefs and data-translate should match desktop -->
+                <li><a href="./index.html" data-translate="navHome">Accueil</a></li>
+                <li><a href="./search.html" data-translate="navSearch">Rechercher de la Musique</a></li>
+                <li><a href="./cue-sheet-metadata.html" data-translate="navMetadata">Rechercher des Métadonnées</a></li>
+                <li><a href="./contact.html" data-translate="navContact">Contactez-nous</a></li>
+				<li><a href="./Terms.html" data-translate="navLegal">Mentions Légales</a></li>
+                 <!-- Mobile language items added in common.js -->
+                 <li class="mobile-lang-item"><a href="#" data-lang="en" data-translate="langEN">EN</a></li> <!-- Add data-translate -->
+                 <li class="mobile-lang-item"><a href="#" data-lang="fr" data-translate="langFR">FR</a></li> <!-- Add data-translate -->
+                 <li class="mobile-lang-item"><a href="#" data-lang="de" data-translate="langDE">DE</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="es" data-translate="langES">ES</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="it" data-translate="langIT">IT</a></li>
+            </ul>
+        </nav>
+    </div>
+
+
+    <div class="main-content">
+        <!-- ****** PAGE-SPECIFIC CONTENT START ****** -->
+        <h1>Contactez-nous</h1> <!-- Translated H1 -->
+        <p>
+            Vous avez des questions, des commentaires ou besoin d'aide pour trouver le bon morceau ? Remplissez le formulaire ci-dessous et nous vous répondrons dès que possible.
+        </p> <!-- Translated Paragraph -->
+
+        <!-- Google Form Embed Container -->
+        <div class="embedded-iframe-container">
+             <!--
+                Instructions to get Google Form embed code:
+                1. Open your Google Form.
+                2. Click the "Send" button (top right).
+                3. Select the "<>" (Embed HTML) tab.
+                4. Adjust the width and height if needed (or use CSS).
+                5. Click "Copy".
+                6. Paste the <iframe> code BELOW, replacing the placeholder.
+            -->
+            <!-- Note: The Google Form itself needs to be configured to display in French or allow language selection -->
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeqbTKL2YYSyyuFY-iRkr7ZaOcsBuR0dfkwVrXgyIgLCal02w/viewform?embedded=true" width="640" height="983" frameborder="0" marginheight="0" marginwidth="0">Chargement…</iframe>
+            <!-- Example: <iframe src="https://docs.google.com/forms/d/e/YOUR_UNIQUE_CODE_HERE/viewform?embedded=true" ...></iframe> -->
+        </div>
+        <!-- ****** PAGE-SPECIFIC CONTENT END ****** -->
+    </div>
+
+	<footer id="page-footer">
+        <div class="footer-content">
+            <p>© 2024 8vb Music. Tous droits réservés.</p> <!-- Updated year and translated -->
+            <nav class="footer-legal-nav">
+                 <a href="./Terms.html#terms-of-service-main">Conditions d'Utilisation</a> <!-- Link within FR directory -->
+                 <span>|</span> <!-- Separator -->
+                 <a href="./Terms.html#privacy-policy">Politique de Confidentialité</a> <!-- Link within FR directory -->
+                 <span>|</span> <!-- Separator -->
+                 <a href="./Terms.html#cookie-statement">Politique de Cookies</a> <!-- Link within FR directory -->
+            </nav>
+        </div>
+    </footer>
+
+    <script src="../js/common.js" defer></script> <!-- Link to parent directory -->
+	<!-- <script src="../js/language-dropdown.js" defer></script> -->
+
+</body>
+</html>

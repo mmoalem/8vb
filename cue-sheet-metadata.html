@@ -7,62 +7,71 @@
 	<meta name="description" content="For clients using 8vb Music: Access essential metadata like PRS tunecodes, ISRCs, and ISWCs needed for completing your cuesheets.">
    
    <link rel="stylesheet" href="style.css">
+
+   <!-- Load the Google Charts library -->
+    <!-- This must be loaded on each page that uses the Viz API -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <!-- Load your shared JavaScript file -->
+    <!-- This contains the logic to fetch and display the sheet data -->
+    <script src="js/sheetDisplay.js" defer></script>
+
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['table']});
+      </script>
+
 	
 </head>
 <body>
     <body>
 
     <!-- Logo Container - Fixed Top Left -->
+    <!-- Top Bar - Fixed container (BACKGROUND ONLY) -->
+    <div id="top-bar"></div>
+
+    <!-- Logo Container - Fixed Top Left (ONLY ONCE) -->
     <div id="logo-container">
-        <img src="images/logo.jpg" alt="Logo">
+         <!-- Path to logo needs to be relative -->
+        <img src="images/logo.jpg" alt="Logo"> <!-- Use "images/logo.jpg" for root EN -->
+        <!-- For fr/index.html, this should be: <img src="../images/logo.jpg" alt="Logo"> -->
     </div>
-	
-	
-    <!-- Top Bar - Fixed container -->
-    <div id="top-bar">
-        <!-- Inner Wrapper - Constrains content to max-width -->
-        <div class="top-bar-content-wrapper">
-		
-		<!-- NEW: Group for Search and Menu -->
-            <div class="controls-group">
 
-            <!-- Search Controls - ONLY ON Search.html -->
-            <!-- Place this DIV *first* inside .top-bar-content-wrapper -->
-            <!-- This div will be ABSENT from index.html, cue-sheet-metadata.html, contact.html -->
-            <!-- Example for Search.html: -->
-            <!--
-            <div id="search-controls">
-                <input type="text" id="search-input" placeholder="Search The Library">
-                <div class="sort-container">
-                    <span class="sort-label">Show results:</span>
-                    <select id="sort-select">
-                        <option value="alphabetical-asc">Alphabetically (A-Z)</option>
-                        <option value="alphabetical-desc">Alphabetically (Z-A)</option>
-                        <option value="isrc-asc">Oldest First</option>
-                        <option value="isrc-desc">Most Recent</option>
-                        <option value="random">Random Order</option>
-                    </select>
-                </div>
-            </div>
-            -->
 
-            <!-- Menu Panel - Fixed -->
+
+
+    <!-- Menu Panel - Fixed -->
     <div id="menu-panel">
         <nav>
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="search.html">Search Music</a></li>
-                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
-                <li><a href="contact.html">Contact Us</a></li>
-				<li><a href="Terms.html">Legal</a></li>
+                <!-- Link hrefs should be relative to the current page -->
+                <li><a href="index.html" data-translate="navHome">Home</a></li> <!-- Use "index.html" for root EN -->
+                <li><a href="search.html" data-translate="navSearch">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html" data-translate="navMetadata">Search Metadata</a></li>
+                <li><a href="contact.html" data-translate="navContact">Contact Us</a></li>
+                <li><a href="Terms.html" data-translate="navLegal">Legal</a></li>
+                 <!-- For fr/index.html, hrefs should be:
+                 <li><a href="./index.html" data-translate="navHome">Accueil</a></li>
+                 <li><a href="./search.html" data-translate="navSearch">Rechercher de la Musique</a></li>
+                 ... etc. -->
+                 <!-- Language Selector - Desktop Dropdown -->
+                <li class="language-menu-item">
+                    <span class="current-language" aria-haspopup="true" aria-expanded="false">
+                         <!-- Flag path needs to be relative -->
+                         <img src="images/flags/fr.svg" alt="French Flag" class="flag-icon"> FR <!-- Use "images/..." for root EN -->
+                         <!-- For fr/index.html: <img src="../images/..." -->
+                    </span>
+                    <ul class="language-dropdown">
+                         <li><a href="#" data-lang="en"><img src="images/flags/gb.svg" alt="English Flag" class="flag-icon"> <span data-translate="langEN">EN</span></a></li>
+                         <li><a href="#" data-lang="fr"><img src="images/flags/fr.svg" alt="French Flag" class="flag-icon"> <span data-translate="langFR">FR</span></a></li>
+                         <li><a href="#" data-lang="de"><img src="images/flags/de.svg" alt="German Flag" class="flag-icon"> <span data-translate="langDE">DE</span></a></li>
+                         <li><a href="#" data-lang="es"><img src="images/flags/es.svg" alt="Spanish Flag" class="flag-icon"> <span data-translate="langES">ES</span></a></li>
+                         <li><a href="#" data-lang="it"><img src="images/flags/it.svg" alt="Italian Flag" class="flag-icon"> <span data-translate="langIT">IT</span></a></li>
+                         <!-- Add other languages here -->
+                    </ul>
+                </li>
             </ul>
         </nav>
     </div>
-			
-			</div> <!-- End of .controls-group -->
-
-        </div> <!-- End of .top-bar-content-wrapper -->
-    </div> <!-- End of #top-bar -->
 
 <!-- Hamburger Icon Button (Mobile) -->
     <button id="hamburger-icon" aria-label="Toggle menu" aria-expanded="false">
@@ -74,13 +83,19 @@
     <!-- Mobile Menu Container -->
     <div id="mobile-menu" aria-hidden="true">
         <nav>
-            <!-- Copy or move the same menu links here -->
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="search.html">Search Music</a></li>
-                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
-                <li><a href="contact.html">Contact Us</a></li>
-				<li><a href="Terms.html">Legal</a></li>
+                 <!-- Link hrefs and data-translate should match desktop -->
+                <li><a href="index.html" data-translate="navHome">Home</a></li>
+                <li><a href="search.html" data-translate="navSearch">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html" data-translate="navMetadata">Search Metadata</a></li>
+                <li><a href="contact.html" data-translate="navContact">Contact Us</a></li>
+				<li><a href="Terms.html" data-translate="navLegal">Legal</a></li>
+                <!-- Mobile language items added in common.js -->
+                <li class="mobile-lang-item"><a href="#" data-lang="en" data-translate="langEN">EN</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="fr" data-translate="langFR">FR</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="de" data-translate="langDE">DE</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="es" data-translate="langES">ES</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="it" data-translate="langIT">IT</a></li>
             </ul>
         </nav>
     </div>
@@ -96,23 +111,12 @@
             Find all the necessary metadata for cue sheet reporting below. You can scroll within the table to view all data.
         </p>
 
-        <!-- Google Sheet Embed Container -->
+        <!-- This is the container where the Google Visualization API will draw the table -->
         <div class="embedded-iframe-container">
-            <!--
-                Instructions to get Google Sheet embed code:
-                1. Open your Google Sheet.
-                2. Go to File > Share > Publish to web.
-                3. Click the "Embed" tab.
-                4. Choose to publish the entire document or a specific sheet.
-                5. Click "Publish" and confirm.
-                6. Copy the generated <iframe> code.
-                7. Paste the <iframe> code BELOW, replacing the placeholder.
-            -->
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTI88kWPwC3ZyPjZqd4OUp4x-YtsiTINwFseRL0JrXcKgsAobcwUKNUgezP-k3Fyt0YyY5frJj8cyYC/pubhtml?gid=1217320799&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
-            <!-- Example: <iframe src="https://docs.google.com/spreadsheets/d/e/YOUR_UNIQUE_CODE_HERE/pubhtml?widget=true&amp;headers=false"></iframe> -->
-        </div>
-        <!-- ****** PAGE-SPECIFIC CONTENT END ****** -->
-    </div>
+            <div id="sheet-data-container">Loading data...</div>
+       </div>
+       <!-- ****** PAGE-SPECIFIC CONTENT END ****** -->
+   </div>
 
 
 	<footer id="page-footer">

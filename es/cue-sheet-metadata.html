@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8vb Music Música de Producción - Metadatos de Cuesheet para clientes (SGAE, ISRC, ISWC)</title> <!-- Translated Title -->
+	<meta name="description" content="Para clientes que utilizan 8vb Music: Acceda a metadatos esenciales como códigos de obra SGAE, ISRCs e ISWCs necesarios para completar sus cuesheets."> <!-- Translated Description -->
+
+   <link rel="stylesheet" href="../style.css"> <!-- Link to parent directory -->
+
+    <!-- Load the Google Charts library -->
+    <!-- This must be loaded on each page that uses the Viz API -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <!-- Load your shared JavaScript file -->
+    <!-- This contains the logic to fetch and display the sheet data -->
+    <script src="../js/sheetDisplay.js" defer></script>
+
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['table']});
+      </script>
+
+</head>
+<body>
+    <body>
+
+    <!-- Logo Container - Fixed Top Left -->
+    <div id="logo-container">
+        <img src="../images/logo.jpg" alt="Logo"> <!-- Link to parent directory -->
+    </div>
+
+    <!-- Top Bar - Fixed container -->
+    <div id="top-bar"></div>
+
+    <!-- Logo Container - Fixed Top Left (ONLY ONCE) -->
+    <div id="logo-container">
+         <!-- Path to logo - CORRECTED relative path -->
+        <img src="../images/logo.jpg" alt="Logo">
+    </div>
+
+
+
+
+    <!-- Menu Panel - Fixed -->
+    <div id="menu-panel">
+        <nav>
+            <ul>
+                <!-- Link hrefs - CORRECTED relative paths -->
+                <li><a href="./index.html" data-translate="navHome">Accueil</a></li> <!-- Add data-translate -->
+                <li><a href="./search.html" data-translate="navSearch">Rechercher de la Musique</a></li> <!-- Add data-translate -->
+                <li><a href="./cue-sheet-metadata.html" data-translate="navMetadata">Rechercher des Métadonnées</a></li> <!-- Add data-translate -->
+                <li><a href="./contact.html" data-translate="navContact">Contactez-nous</a></li> <!-- Add data-translate -->
+                <li><a href="./Terms.html" data-translate="navLegal">Mentions Légales</a></li> <!-- Add data-translate -->
+                 <!-- Language Selector - Desktop Dropdown -->
+                <li class="language-menu-item">
+                    <span class="current-language" aria-haspopup="true" aria-expanded="false">
+                         <!-- Flag path - CORRECTED relative path -->
+                         <img src="../images/flags/de.svg" alt="Bandera Española" class="flag-icon"> ES
+                    </span>
+                    <ul class="language-dropdown">
+                         <li><a href="#" data-lang="en"><img src="../images/flags/gb.svg" alt="English Flag" class="flag-icon"> <span data-translate="langEN">EN</span></a></li> <!-- Add data-translate -->
+                         <li><a href="#" data-lang="fr"><img src="../images/flags/fr.svg" alt="French Flag" class="flag-icon"> <span data-translate="langFR">FR</span></a></li> <!-- Add data-translate -->
+                         <li><a href="#" data-lang="de"><img src="../images/flags/de.svg" alt="German Flag" class="flag-icon"> <span data-translate="langDE">DE</span></a></li>
+                         <li><a href="#" data-lang="es"><img src="../images/flags/es.svg" alt="Spanish Flag" class="flag-icon"> <span data-translate="langES">ES</span></a></li>
+                         <li><a href="#" data-lang="it"><img src="../images/flags/it.svg" alt="Italian Flag" class="flag-icon"> <span data-translate="langIT">IT</span></a></li>
+                         <!-- Add other languages here -->
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+<!-- Hamburger Icon Button (Mobile) -->
+    <button id="hamburger-icon" aria-label="Alternar menú" aria-expanded="false">
+        <span></span> <!-- Line 1 -->
+        <span></span> <!-- Line 2 -->
+        <span></span> <!-- Line 3 -->
+    </button>
+
+    <!-- Mobile Menu Container -->
+    <div id="mobile-menu" aria-hidden="true">
+        <nav>
+            <ul>
+                 <!-- Link hrefs and data-translate should match desktop -->
+                <li><a href="./index.html" data-translate="navHome">Accueil</a></li>
+                <li><a href="./search.html" data-translate="navSearch">Rechercher de la Musique</a></li>
+                <li><a href="./cue-sheet-metadata.html" data-translate="navMetadata">Rechercher des Métadonnées</a></li>
+                <li><a href="./contact.html" data-translate="navContact">Contactez-nous</a></li>
+				<li><a href="./Terms.html" data-translate="navLegal">Mentions Légales</a></li>
+                 <!-- Mobile language items added in common.js -->
+                 <li class="mobile-lang-item"><a href="#" data-lang="en" data-translate="langEN">EN</a></li> <!-- Add data-translate -->
+                 <li class="mobile-lang-item"><a href="#" data-lang="fr" data-translate="langFR">FR</a></li> <!-- Add data-translate -->
+                 <li class="mobile-lang-item"><a href="#" data-lang="de" data-translate="langDE">DE</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="es" data-translate="langES">ES</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="it" data-translate="langIT">IT</a></li>
+            </ul>
+        </nav>
+    </div>
+
+
+
+    <div class="main-content">
+        <!-- ****** PAGE-SPECIFIC CONTENT START ****** -->
+        <h1>Metadatos para Cuesheets</h1>
+        <p>
+            Encuentre a continuación todos los metadatos necesarios para reportar en sus cuesheets. Puede desplazarse dentro de la tabla para ver todos los datos.
+        </p>
+
+        <!-- Google Sheet Embed Container -->
+        <div class="embedded-iframe-container">
+            <div id="sheet-data-container">Loading data...</div>
+       </div>
+       <!-- ****** PAGE-SPECIFIC CONTENT END ****** -->
+   </div>
+
+
+
+	<footer id="page-footer">
+        <div class="footer-content">
+             <!-- Add data-translate -->
+            <p data-translate="footerCopyright">© 2024 8vb Music. Tous droits réservés.</p> <!-- Updated year and translated -->
+            <nav class="footer-legal-nav">
+                 <!-- Add data-translate and ensure relative links -->
+                 <a href="./Terms.html#terms-of-service-main" data-translate="footerTerms">Conditions d'Utilisation</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="./Terms.html#privacy-policy" data-translate="footerPrivacy">Politique de Confidentialité</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="./Terms.html#cookie-statement" data-translate="footerCookies">Politique de Cookies</a>
+            </nav>
+        </div>
+    </footer>
+
+     <script src="../js/common.js" defer></script> <!-- Link to parent directory -->
+
+</body>
+</html>

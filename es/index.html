@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es"> <!-- lang attribute will be set by common.js -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title and meta tags - MANUALLY TRANSLATED -->
+    <title>8vb Music - Biblioteca de Música de Producción en Londres | SGAE</title> <!-- Translated Title -->
+	<meta name="description" content="Página de inicio de 8vb Music, una biblioteca de música de producción registrada en SGAE (y organizaciones internacionales similares). Con sede en Londres, GB, ofrece música de alta calidad y fácil de licenciar para videojuegos, difusión, cine y cualquier otro proyecto que requiera música de fondo única y de primera calidad."> <!-- Translated Description -->
+    <meta name="keywords" content="keywords" content="música, música de producción, televisión, cine, juegos, difusión, b2b, biblioteca de música, música orquestal épica, música minimalista para piano, música edificante, partitura cinematográfica triste, partitura de cine, música para publicidad, música de fondo para documentales, biblioteca musical SGAE, música con licencia, licencia de música de producción"> <!-- Translated Keywords -->
+    <!-- Path to style.css - CORRECTED relative path -->
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <!-- Top Bar - Fixed container (BACKGROUND ONLY) -->
+    <div id="top-bar"></div>
+
+    <!-- Logo Container - Fixed Top Left (ONLY ONCE) -->
+    <div id="logo-container">
+         <!-- Path to logo - CORRECTED relative path -->
+        <img src="../images/logo.jpg" alt="Logo">
+    </div>
+
+
+
+
+    <!-- Menu Panel - Fixed -->
+    <div id="menu-panel">
+        <nav>
+            <ul>
+                <!-- Link hrefs - CORRECTED relative paths -->
+                <li><a href="./index.html" data-translate="navHome">Accueil</a></li> <!-- Add data-translate -->
+                <li><a href="./search.html" data-translate="navSearch">Rechercher de la Musique</a></li> <!-- Add data-translate -->
+                <li><a href="./cue-sheet-metadata.html" data-translate="navMetadata">Rechercher des Métadonnées</a></li> <!-- Add data-translate -->
+                <li><a href="./contact.html" data-translate="navContact">Contactez-nous</a></li> <!-- Add data-translate -->
+                <li><a href="./Terms.html" data-translate="navLegal">Mentions Légales</a></li> <!-- Add data-translate -->
+                 <!-- Language Selector - Desktop Dropdown -->
+                <li class="language-menu-item">
+                    <span class="current-language" aria-haspopup="true" aria-expanded="false">
+                         <!-- Flag path - CORRECTED relative path -->
+                         <img src="../images/flags/fr.svg" alt="Bandera Española" class="flag-icon"> ES
+                    </span>
+                    <ul class="language-dropdown">
+                         <li><a href="#" data-lang="en"><img src="../images/flags/gb.svg" alt="English Flag" class="flag-icon"> <span data-translate="langEN">EN</span></a></li> <!-- Add data-translate -->
+                         <li><a href="#" data-lang="fr"><img src="../images/flags/fr.svg" alt="French Flag" class="flag-icon"> <span data-translate="langFR">FR</span></a></li> <!-- Add data-translate -->
+                         <li><a href="#" data-lang="de"><img src="../images/flags/de.svg" alt="German Flag" class="flag-icon"> <span data-translate="langDE">DE</span></a></li>
+                         <li><a href="#" data-lang="es"><img src="../images/flags/es.svg" alt="Spanish Flag" class="flag-icon"> <span data-translate="langES">ES</span></a></li>
+                         <li><a href="#" data-lang="it"><img src="../images/flags/it.svg" alt="Italian Flag" class="flag-icon"> <span data-translate="langIT">IT</span></a></li>
+                         <!-- Add other languages here -->
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+<!-- Hamburger Icon Button (Mobile) -->
+    <button id="hamburger-icon" aria-label="Alternar menú" aria-expanded="false">
+        <span></span> <!-- Line 1 -->
+        <span></span> <!-- Line 2 -->
+        <span></span> <!-- Line 3 -->
+    </button>
+
+    <!-- Mobile Menu Container -->
+    <div id="mobile-menu" aria-hidden="true">
+        <nav>
+            <ul>
+                 <!-- Link hrefs and data-translate should match desktop -->
+                <li><a href="./index.html" data-translate="navHome">Accueil</a></li>
+                <li><a href="./search.html" data-translate="navSearch">Rechercher de la Musique</a></li>
+                <li><a href="./cue-sheet-metadata.html" data-translate="navMetadata">Rechercher des Métadonnées</a></li>
+                <li><a href="./contact.html" data-translate="navContact">Contactez-nous</a></li>
+				<li><a href="./Terms.html" data-translate="navLegal">Mentions Légales</a></li>
+                 <!-- Mobile language items added in common.js -->
+                 <li class="mobile-lang-item"><a href="#" data-lang="en" data-translate="langEN">EN</a></li> <!-- Add data-translate -->
+                 <li class="mobile-lang-item"><a href="#" data-lang="fr" data-translate="langFR">FR</a></li> <!-- Add data-translate -->
+                 <li class="mobile-lang-item"><a href="#" data-lang="de" data-translate="langDE">DE</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="es" data-translate="langES">ES</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="it" data-translate="langIT">IT</a></li>
+            </ul>
+        </nav>
+    </div>
+
+
+
+
+    <!-- Main Content Area for Homepage -->
+    <div class="main-content-home">
+
+        <!-- Top Row of Featured Albums -->
+        <div class="featured-albums">
+
+            <div class="album-grid" id="top-album-grid">
+                <!-- Loading message will be translated by JS -->
+                <p data-translate="indexLoadingAlbums">Cargando álbumes...</p>
+            </div>
+        </div>
+
+        <!-- Central Content Block -->
+        <div class="home-welcome-content">
+            <!-- Add data-translate to heading and paragraphs -->
+            <h1 data-translate="indexWelcomeHeading">Bienvenido a la biblioteca de música de producción de 8vb Music</h1>
+            <p data-translate="indexWelcomePara1">
+                Fundado por músicos y editores de video, nuestro catálogo tiene como objetivo satisfacer los requisitos que encontramos trabajando en la postproducción de televisión y cine. Sin embargo, nuestra música versátil encaja perfectamente en cualquier proyecto multimedia: juegos, podcasts, contenido en línea y más. Nuestro objetivo es construir un catálogo dinámico de pistas musicales distintivas que aún sean fáciles de colocar en cualquier línea de tiempo de edición.
+            </p>
+            <p data-translate="indexWelcomePara2">
+                 8vb Music está registrado en <b>SGAE</b> (y organizaciones internacionales similares) y opera bajo las licencias estándar de estas organizaciones, lo que garantiza un proceso de autorización sencillo para uso profesional en todo el mundo, brindándole tranquilidad.
+             </p>
+            <p data-translate="indexWelcomePara3">
+                 Explore nuestra colección: Puede buscar, audicionar y descargar música de producción de alta calidad directamente desde nuestro catálogo. Haga clic en la portada de cualquier álbum en esta página para explorar sus pistas, o <a href="search.html">busque</a> en toda nuestra colección por palabras clave, género, estado de ánimo, instrumentación y más.
+                 <!-- Note: The <a> tags inside this paragraph will be handled by the HTML in the translations.json file -->
+            </p>
+            <p data-translate="indexWelcomePara4">
+                 Stems, versiones reducidas y mezclas alternativas están disponibles para la mayoría de las pistas. Si necesita estas versiones específicas, no dude en <a href="contact.html">contactarnos</a> con sus requisitos.
+                  <!-- Note: The <a> tags inside this paragraph will be handled by the HTML in the translations.json file -->
+             </p>
+        </div>
+
+        <!-- Bottom Rows of Featured Albums -->
+        <div class="featured-albums">
+            <div class="album-grid" id="bottom-album-grid">
+                <!-- Album covers will be injected here by JS -->
+            </div>
+        </div>
+
+    </div><!-- End of .main-content-home -->
+
+	<footer id="page-footer">
+        <div class="footer-content">
+             <!-- Add data-translate -->
+            <p data-translate="footerCopyright">© 2024 8vb Music. Tous droits réservés.</p> <!-- Updated year and translated -->
+            <nav class="footer-legal-nav">
+                 <!-- Add data-translate and ensure relative links -->
+                 <a href="./Terms.html#terms-of-service-main" data-translate="footerTerms">Conditions d'Utilisation</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="./Terms.html#privacy-policy" data-translate="footerPrivacy">Politique de Confidentialité</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="./Terms.html#cookie-statement" data-translate="footerCookies">Politique de Cookies</a>
+            </nav>
+        </div>
+    </footer>
+
+   <!-- Script paths - CORRECTED relative paths -->
+   <script src="../js/common.js" defer></script>
+   <script src="../js/index-logic.js" defer></script>
+
+</body>
+</html>

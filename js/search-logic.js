@@ -1,120 +1,334 @@
-// js/script.js - Logic ONLY for search.html
+// --- js/search-logic.js (Finalized with dynamic relative paths) ---
+// Logic ONLY for search.html
 
 let mainMusicData = [];
 let allVersionsData = [];
-let currentResults = []; // Holds ALL filtered/sorted results
+let currentResults = [];
 let currentPage = 1;
-const resultsPerPage = 10; // Or your preferred number
+const resultsPerPage = 10;
 
-async function loadMusicData() {
+let initialSearchSetupDone = false;
+
+
+// Add the resource path helper function here
+function getResourcePath(resourceType, filename) {
+    const isInLanguageFolder = /[\/\\][a-z]{2}[\/\\]/i.test(window.location.pathname);
+    const pathPrefix = isInLanguageFolder ? '../' : '';
+    
+    // If this is a JSON file that needs language-specific version
+    if (filename === 'music_data.json' || filename === 'all_versions_data.json') {
+        const baseName = filename.replace('.json', '');
+        const languagePair = determineLanguagePair();
+        return pathPrefix + resourceType + '/' + encodeURIComponent(`${baseName}-${languagePair}.json`);
+    }
+    
+    return pathPrefix + resourceType + '/' + encodeURIComponent(filename);
+}
+
+// Helper function to determine which language pair JSON to load
+function determineLanguagePair() {
+    // Get the current language from the URL path or from your language system
+    const path = window.location.pathname;
+    
+    // Default to en-fr
+    let languagePair = "en-fr";
+    
+    // Check for language folders in the path
+    if (path.includes('/de/') || path.match(/[\/\\]de[\/\\]/)) {
+        languagePair = "en-de";
+    } else if (path.includes('/sp/') || path.match(/[\/\\]sp[\/\\]/)) {
+        languagePair = "en-sp";
+    } else if (path.includes('/fr/') || path.match(/[\/\\]fr[\/\\]/)) {
+        languagePair = "en-fr";
+    }
+    
+    return languagePair;
+}
+
+async function loadMusicDataAndSetupSearch() {
+    if (initialSearchSetupDone) {
+         console.log("Search-logic: Initial setup already done, skipping.");
+         return;
+    }
+     initialSearchSetupDone = true;
+     console.log('Search-logic: Starting initial data load and setup...');
+
+    const resultsContainer = document.getElementById('results');
+     const searchInput = document.getElementById('search-input');
+     const sortSelect = document.getElementById('sort-select');
+     const modal = document.getElementById('versionsModal');
+
+
+    if (!resultsContainer || !searchInput || !sortSelect || !modal) {
+         console.error("Search-logic: Missing required HTML elements for search page.");
+         initialSearchSetupDone = false;
+         return;
+    }
+
+    const currentLang = window.getCurrentLanguage();
+     const translations = window.getTranslations();
+     const loadingMessage = translations?.loadingMusicData?.[currentLang] || translations?.loadingMusicData?.en || 'Loading music data...';
+
+    resultsContainer.innerHTML = `<p style="text-align: center; margin-top: 20px;" data-translate="loadingMusicData">${loadingMessage}</p>`;
+
+
     try {
-        // Assuming JSON files are in the root or correct relative path
-        const mainResponse = await fetch('music_data.json');
-        handleFetchError(mainResponse); // Check response before parsing
+        // Improved path detection for language folders
+        const musicDataPath = getResourcePath('js', 'music_data.json');
+const allVersionsDataPath = getResourcePath('js', 'all_versions_data.json');
+        console.log("Search-logic: Attempting to fetch music data from:", musicDataPath);
+        console.log("Search-logic: Attempting to fetch all versions data from:", allVersionsDataPath);
+
+
+        const mainResponse = await fetch(musicDataPath);
+        handleFetchError(mainResponse);
         mainMusicData = await mainResponse.json();
 
-        const allVersionsResponse = await fetch('all_versions_data.json');
-        handleFetchError(allVersionsResponse); // Check response before parsing
+        const allVersionsResponse = await fetch(allVersionsDataPath);
+        handleFetchError(allVersionsResponse);
         allVersionsData = await allVersionsResponse.json();
 
         console.log('Search-logic: Music data loaded successfully');
+
+         const translations = window.getTranslations(); // Re-get translations after load wait
+
+         // Apply placeholder translation
+         const placeholderKey = searchInput.getAttribute('data-translate-placeholder');
+         if(placeholderKey && translations && translations[placeholderKey] && translations[placeholderKey][currentLang]) {
+             searchInput.placeholder = translations[placeholderKey][currentLang];
+         } else if (placeholderKey && translations && translations[placeholderKey] && translations[placeholderKey]['en']) {
+             searchInput.placeholder = translations[placeholderKey]['en'];
+         }
+
+         // Apply sort option translations
+         const sortOptions = sortSelect.querySelectorAll('option');
+         sortOptions.forEach(option => {
+              const key = option.getAttribute('data-translate');
+              if(key && translations && translations[key] && translations[key][currentLang]) {
+                   option.textContent = translations[key][currentLang];
+              } else if (key && translations && translations[key] && translations[key]['en']) {
+                   option.textContent = translations[key]['en'];
+              }
+         });
+
+         // Apply sort label translation
+         const sortLabelSpan = document.querySelector('#search-controls .sort-label');
+          if(sortLabelSpan && translations) {
+               const key = sortLabelSpan.getAttribute('data-translate');
+               if(key && translations[key] && translations[key][currentLang]) {
+                    sortLabelSpan.textContent = translations[key][currentLang];
+               } else if (key && translations[key] && translations[key]['en']) {
+                    sortLabelSpan.textContent = translations[key]['en'];
+               }
+          }
+
+
+        searchInput.addEventListener('input', window.debounce(search, 300));
+        sortSelect.addEventListener('change', sortAndDisplayResults);
+
+         window.addEventListener('click', (event) => {
+             const modalElement = document.getElementById('versionsModal');
+             if (modalElement && event.target == modalElement) {
+                 closeModal();
+             }
+         });
+
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const albumQuery = urlParams.get('album');
+
+        if (albumQuery) {
+             const decodedAlbumQuery = decodeURIComponent(albumQuery);
+             console.log(`Search-logic: Searching for album from URL: ${decodedAlbumQuery}`);
+
+             const albumLabel = translations?.albumLabel?.[currentLang] || translations?.albumLabel?.en || 'Album:';
+             searchInput.value = `${albumLabel} "${decodedAlbumQuery}"`;
+
+             currentResults = mainMusicData.filter(track => {
+                  const albumName = track.Album;
+                   if (typeof albumName === 'object') {
+                       return Object.values(albumName).some(name =>
+                            typeof name === 'string' && name.toLowerCase() === decodedAlbumQuery.toLowerCase()
+                       );
+                   } else {
+                       return typeof albumName === 'string' && albumName.toLowerCase() === decodedAlbumQuery.toLowerCase();
+                   }
+             });
+             currentPage = 1;
+             sortAndDisplayResults();
+         } else {
+             console.log('Search-logic: Initial display (no album query)...');
+             search();
+         }
+
+
     } catch (error) {
-        console.error('Search-logic: Error loading music data:', error);
-        const resultsContainer = document.getElementById('results');
-        if (resultsContainer) {
-            resultsContainer.innerHTML = '<p style="color: red; text-align: center; margin-top: 30px;">Error loading music data. Please check console or try again later.</p>';
-        }
+        console.error('Search-logic: Error loading music data or during setup:', error);
+        const translations = window.getTranslations();
+        const currentLang = window.getCurrentLanguage();
+        const errorMessage = translations?.dataLoadError?.[currentLang] || translations?.dataLoadError?.en || 'Error loading music data. Please check console or try again later.';
+        resultsContainer.innerHTML = `<p style="color: red; text-align: center; margin-top: 30px;">${errorMessage}</p>`;
+         initialSearchSetupDone = false;
     }
 }
+
 
 function handleFetchError(response) {
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status} for ${response.url}`);
     }
-    // No need to return response here, just throw on error
 }
 
 function search() {
-    if (mainMusicData.length === 0) {
-        console.log('Search-logic: No music data available yet for search.');
-        const resultsContainer = document.getElementById('results');
-        if (resultsContainer && !resultsContainer.hasChildNodes()) {
-             resultsContainer.innerHTML = '<p style="text-align: center; margin-top: 20px;">Loading music data...</p>';
-        }
-        return;
-    }
+     if (!window.getTranslations() || mainMusicData.length === 0) {
+         console.log('Search-logic: Translations or music data not available for search.');
+         const resultsContainer = document.getElementById('results');
+         if (resultsContainer && !resultsContainer.hasChildNodes()) {
+             const loadingMessage = window.getTranslations()?.loadingMusicData?.[window.getCurrentLanguage()] || window.getTranslations()?.loadingMusicData?.en || 'Loading music data...';
+             resultsContainer.innerHTML = `<p style="text-align: center; margin-top: 20px;" data-translate="loadingMusicData">${loadingMessage}</p>`;
+         }
+         return;
+     }
+
 
     const searchInput = document.getElementById('search-input');
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
-    console.log('Search-logic: Searching for:', searchTerm);
+    console.log('Search-logic: Performing search for:', searchTerm);
 
-    if (searchTerm === "") {
-        currentResults = [...mainMusicData];
+     const currentLang = window.getCurrentLanguage();
+     const translations = window.getTranslations();
+     const albumLabel = translations?.albumLabel?.[currentLang] || translations?.albumLabel?.en || 'Album:';
+
+
+    if (searchTerm === "" || searchTerm.startsWith(`${albumLabel.toLowerCase()} `)) {
+         let filteredByAlbum = [...mainMusicData];
+         if (searchTerm.startsWith(`${albumLabel.toLowerCase()} `)) {
+              const albumQuery = searchTerm.substring(albumLabel.length + 1).trim().replace(/^"|"$/g, '');
+
+              filteredByAlbum = mainMusicData.filter(track => {
+                   const albumName = track.Album;
+                   if (typeof albumName === 'object') {
+                       return Object.values(albumName).some(name =>
+                            typeof name === 'string' && name.toLowerCase() === albumQuery.toLowerCase()
+                       );
+                   } else {
+                       return typeof albumName === 'string' && albumName.toLowerCase() === albumQuery.toLowerCase();
+                   }
+              });
+         }
+         currentResults = filteredByAlbum;
+
     } else {
         currentResults = mainMusicData.filter(track => {
-            // Function to safely check fields
             const checkField = (fieldName) => {
                 const fieldValue = track[fieldName];
-                // Check if it's a string and includes the search term
-                return typeof fieldValue === 'string' && fieldValue.toLowerCase().includes(searchTerm);
+                if (typeof fieldValue === 'string') {
+                    return fieldValue.toLowerCase().includes(searchTerm);
+                } else if (typeof fieldValue === 'object') {
+                    return Object.values(fieldValue).some(value =>
+                        typeof value === 'string' && value.toLowerCase().includes(searchTerm)
+                    );
+                }
+                return false;
             };
-            // List all fields to search within
-            return (
-                checkField('Track Name') || checkField('Master Track Name') || checkField('Artist') ||
-                checkField('Album') || checkField('KEYWORD/TAGS') || checkField('MOOD') ||
-                checkField('GENRE') || checkField('STYLE') || checkField('INSTRUMENTS')
-            );
+
+             return (
+                 checkField('Master Track Name') || checkField('Track Name') || checkField('Artist') ||
+                checkField('KEYWORD/TAGS') || checkField('MOOD') ||
+                checkField('GENRE') || checkField('STYLE') || checkField('INSTRUMENTS') ||
+                checkField('TEMPO') || checkField('Version') || checkField('Key')
+             );
         });
     }
 
-    console.log('Search-logic: Total number of results:', currentResults.length);
-    currentPage = 1; // Reset to first page on new search
+    console.log('Search-logic: Total number of results after search:', currentResults.length);
+    currentPage = 1;
     sortAndDisplayResults();
 }
 
-function searchByAlbumCover(artworkPath) {
-     if (mainMusicData.length === 0) return;
-    const filename = artworkPath.split('/').pop();
-    // Find the album name associated with this artwork file
-    const albumName = mainMusicData.find(track => track.artwork === filename)?.Album;
-    const searchInput = document.getElementById('search-input');
+function searchByAlbumCover(artworkOriginalFileName) { // Accept just the file name
+     if (mainMusicData.length === 0) {
+         console.log('Search-logic: Data not loaded yet, cannot search by album.');
+         return;
+     }
+     const translations = window.getTranslations();
+     const currentLang = window.getCurrentLanguage();
+     const searchInput = document.getElementById('search-input');
+     if (!searchInput) return;
 
-    if (albumName && searchInput) {
-        currentResults = mainMusicData.filter(track => track.Album === albumName);
-        searchInput.value = `Album: "${albumName}"`; // Show filter in search box
+    // Find the album name object associated with this artwork file in the full dataset
+    const albumEntry = mainMusicData.find(track => track.artwork === artworkOriginalFileName);
+    const albumNameObj = albumEntry?.Album;
+
+    if (albumNameObj) {
+         const albumNameEnglish = typeof albumNameObj === 'object' ? albumNameObj.en : albumNameObj;
+
+        currentResults = mainMusicData.filter(track => {
+            const trackAlbum = track.Album;
+            if (typeof trackAlbum === 'object') {
+                return Object.values(trackAlbum).some(name => typeof name === 'string' && name.toLowerCase() === albumNameEnglish.toLowerCase());
+            } else {
+                 return typeof trackAlbum === 'string' && trackAlbum.toLowerCase() === albumNameEnglish.toLowerCase();
+            }
+        });
+
+         const albumLabel = translations?.albumLabel?.[currentLang] || translations?.albumLabel?.en || 'Album:';
+         const albumNameDisplay = typeof albumNameObj === 'object' ?
+                                  (albumNameObj[currentLang] ?? albumNameObj.en ?? albumNameEnglish) :
+                                  (albumNameObj || albumNameEnglish);
+
+        searchInput.value = `${albumLabel} "${albumNameDisplay}"`;
+
     } else {
-         console.warn(`Search-logic: No album found for artwork: ${filename}`);
+         console.warn(`Search-logic: No album found for artwork: ${artworkOriginalFileName}`);
         currentResults = [];
-        if(searchInput) searchInput.value = '';
+        searchInput.value = '';
     }
      currentPage = 1;
     sortAndDisplayResults();
 }
 
+
 function sortAndDisplayResults() {
     const sortSelect = document.getElementById('sort-select');
-    const sortMethod = sortSelect ? sortSelect.value : 'alphabetical-asc'; // Default sort
-    let sortedResults = [...currentResults]; // Work with a copy
+    const sortMethod = sortSelect ? sortSelect.value : 'alphabetical-asc';
+    let sortedResults = [...currentResults];
+
+    const currentLang = window.getCurrentLanguage();
 
     switch (sortMethod) {
         case 'alphabetical-asc':
-            sortedResults.sort((a, b) => (a['Track Name'] || '').localeCompare(b['Track Name'] || ''));
-            break;
         case 'alphabetical-desc':
-            sortedResults.sort((a, b) => (b['Track Name'] || '').localeCompare(a['Track Name'] || ''));
+            sortedResults.sort((a, b) => {
+                 const nameA = (typeof a['Track Name'] === 'object' ? (a['Track Name'][currentLang] ?? a['Track Name'].en) : (a['Track Name'] || a['Master Track Name'] || ''));
+                 const nameB = (typeof b['Track Name'] === 'object' ? (b['Track Name'][currentLang] ?? b['Track Name'].en) : (b['Track Name'] || b['Master Track Name'] || ''));
+
+                if (sortMethod === 'alphabetical-asc') {
+                    return nameA.localeCompare(nameB);
+                } else {
+                    return nameB.localeCompare(nameA);
+                }
+            });
             break;
-        case 'isrc-asc': // Oldest first based on ISRC string compare
+        case 'isrc-asc':
             sortedResults.sort((a, b) => (a['ISRC'] || '').localeCompare(b['ISRC'] || ''));
             break;
-        case 'isrc-desc': // Newest first
+        case 'isrc-desc':
             sortedResults.sort((a, b) => (b['ISRC'] || '').localeCompare(a['ISRC'] || ''));
             break;
         case 'random':
             sortedResults.sort(() => Math.random() - 0.5);
             break;
+         default:
+             sortedResults.sort((a, b) => {
+                 const nameA = (typeof a['Track Name'] === 'object' ? (a['Track Name'][currentLang] ?? a['Track Name'].en) : (a['Track Name'] || a['Master Track Name'] || ''));
+                 const nameB = (typeof b['Track Name'] === 'object' ? (b['Track Name'][currentLang] ?? b['Track Name'].en) : (b['Track Name'] || b['Master Track Name'] || ''));
+                  return nameA.localeCompare(nameB);
+             });
+             break;
     }
-    currentResults = sortedResults; // Update the main list
-    displayResults(); // Display the current (first) page
+    currentResults = sortedResults;
+    displayResults();
 }
 
 function displayResults() {
@@ -124,98 +338,138 @@ function displayResults() {
         console.error("Search-logic: Results container not found!");
         return;
     }
-    resultsContainer.innerHTML = ''; // Clear previous results
+    resultsContainer.innerHTML = '';
 
     const startIndex = (currentPage - 1) * resultsPerPage;
     const endIndex = startIndex + resultsPerPage;
     const paginatedResults = currentResults.slice(startIndex, endIndex);
 
+    
+
     console.log(`Search-logic: Displaying page ${currentPage}, results ${startIndex + 1} to ${Math.min(endIndex, currentResults.length)} of ${currentResults.length}`);
+
+    const currentLang = window.getCurrentLanguage();
+     const translations = window.getTranslations();
+
 
     if (paginatedResults.length === 0) {
          const searchInput = document.getElementById('search-input');
          const searchTerm = searchInput ? searchInput.value.trim() : "";
          if (searchTerm !== "") {
-              resultsContainer.innerHTML = `<p style="text-align: center; margin-top: 20px;">No results found matching "${searchTerm}".</p>`;
+             const noResultsMessage = translations?.noResultsFound?.[currentLang] || translations?.noResultsFound?.en || 'No results found matching';
+              resultsContainer.innerHTML = `<p style="text-align: center; margin-top: 20px;">${noResultsMessage} "${searchTerm}".</p>`;
          } else {
-              // If search term is empty and still no results, likely data hasn't loaded or is empty
-              resultsContainer.innerHTML = '<p style="text-align: center; margin-top: 20px;">No tracks to display. Loading or empty dataset.</p>';
+               const noTracksMessage = translations?.noTracksToDisplay?.[currentLang] || translations?.noTracksToDisplay?.en || 'No tracks to display. Loading or empty dataset.';
+               resultsContainer.innerHTML = `<p style="text-align: center; margin-top: 20px;">${noTracksMessage}</p>`;
          }
     } else {
+        // Determine path prefix for local resources (images)
+        const musicDataPath = getResourcePath('js', 'music_data.json');
+        const allVersionsDataPath = getResourcePath('js', 'all_versions_data.json');
+
+
         paginatedResults.forEach(track => {
-            // Safer data access with defaults
-            const trackName = track['Master Track Name'] || track['Track Name'] || 'Untitled Track';
+            const masterTrackName = track['Master Track Name'] || 'Untitled Track';
             const artistName = track['Artist'] || 'Unknown Artist';
             const isrcCode = track['ISRC'] || 'N/A';
             const prsCode = track['PrsTunecodeFinal'] || 'N/A';
             const iswcCode = track['ISWC'] || 'N/A';
-            const albumName = track['Album'] || 'Unknown Album';
-            const artworkFile = track.artwork || 'default_artwork.png';
-            const wavFile = track['wav file name'] || `${trackName}.wav`; // Default guess
-            const mp3File = wavFile.replace(/\.wav$/i, '.mp3'); // Default guess
+            const albumNameEnglish = typeof track.Album === 'object' ? track.Album.en : (track.Album || 'Unknown Album');
 
-            // Assuming base URLs/paths
-            const wavPath = `https://audio.8vbmusic.com/${wavFile}`;
-            const mp3Path = `https://audio.8vbmusic.com/MP3s/${mp3File}`;
-            const artworkPath = `Artwork/${artworkFile}`;
+             const trackNameDisplay = typeof track['Track Name'] === 'object' ? (track['Track Name'][currentLang] ?? track['Track Name'].en ?? masterTrackName) : (track['Track Name'] || masterTrackName);
+             const versionText = typeof track.Version === 'object' ? (track.Version[currentLang] ?? track.Version.en ?? 'Version') : (track.Version || 'Version');
+             const genreText = typeof track.GENRE === 'object' ? (track.GENRE[currentLang] ?? track.GENRE.en ?? 'N/A') : (track.GENRE || 'N/A');
+             const moodText = typeof track.MOOD === 'object' ? (track.MOOD[currentLang] ?? track.MOOD.en ?? 'N/A') : (track.MOOD || 'N/A');
+             const keywordsText = typeof track['KEYWORD/TAGS'] === 'object' ? (track['KEYWORD/TAGS'][currentLang] ?? track['KEYWORD/TAGS'].en ?? 'N/A') : (track['KEYWORD/TAGS'] || 'N/A');
+
+
+            const artworkFile = track.artwork || 'default_artwork.png';
+            const wavFile = track['wav file name'] || `${masterTrackName}.wav`;
+            const mp3File = wavFile.replace(/\.wav$/i, '.mp3');
+
+             // Audio paths are absolute URLs to the audio server
+            const wavPath = `https://audio.8vbmusic.com/${encodeURIComponent(wavFile)}`;
+            const mp3Path = `https://audio.8vbmusic.com/MP3s/${encodeURIComponent(mp3File)}`;
+             // Artwork path uses pathPrefix for local images
+            const artworkPath = getResourcePath('Artwork', artworkFile);
+
 
             const resultRow = document.createElement('div');
             resultRow.className = 'result-row';
 
-            // Artwork
             const artwork = document.createElement('img');
-            artwork.src = encodeURI(artworkPath);
-            artwork.alt = `${albumName} album artwork`;
+            artwork.src = artworkPath;
+            artwork.alt = `${albumNameEnglish} album artwork`;
             artwork.className = 'artwork';
             artwork.style.cursor = 'pointer';
-            artwork.onclick = () => searchByAlbumCover(artworkPath);
+            // Pass the original artwork file name to searchByAlbumCover
+            artwork.onclick = () => searchByAlbumCover(artworkFile);
             artwork.onerror = function() {
                 this.onerror=null;
-                this.src='images/default_artwork.png';
+                // Default image path needs pathPrefix
+                this.src = getResourcePath('images', 'default_artwork.png');
                 this.alt = 'Default album artwork';
                 artwork.style.cursor = 'default';
                 artwork.onclick = null;
             };
             resultRow.appendChild(artwork);
 
-            // Track Info
             const trackInfo = document.createElement('div');
             trackInfo.className = 'track-info';
-            trackInfo.innerHTML = `
-                <div class="track-name">${trackName}</div>
-                <div class="artist">Composer/Artist: <strong>${artistName}</strong></div>
-                <div class="isrc">ISRC: <strong>${isrcCode}</strong> / PRS Tunecode: <strong>${prsCode}</strong> / ISWC: <strong>${iswcCode}</strong></div>
-            `;
+
+             const displayedTrackName = `${masterTrackName}`;
+
+             const artistLabel = translations?.artistLabel?.[currentLang] || translations?.artistLabel?.en || 'Composer/Artist:';
+             const isrcLabel = translations?.isrcLabel?.[currentLang] || translations?.isrcLabel?.en || 'ISRC:';
+             const prsLabel = translations?.prsTunecodeLabel?.[currentLang] || translations?.prsTunecodeLabel?.en || 'PRS Tunecode:';
+             const iswcLabel = translations?.iswcLabel?.[currentLang] || translations?.iswcLabel?.en || 'ISWC:';
+             const genreLabel = translations?.genreLabel?.[currentLang] || translations?.genreLabel?.en || 'Genre:';
+             const moodLabel = translations?.moodLabel?.[currentLang] || translations?.moodLabel?.en || 'Mood:';
+             const keywordsLabel = translations?.keywordsLabel?.[currentLang] || translations?.keywordsLabel?.en || 'Keywords:';
+
+             const genreTextLowercase = genreText.toLowerCase();
+             const moodTextLowercase = moodText.toLowerCase();
+ 
+             trackInfo.innerHTML = `
+                 <div class="track-name">${displayedTrackName}</div>
+                 <div class="artist">${artistLabel} <strong>${artistName}</strong></div>
+                 <div class="isrc">${isrcLabel} <strong>${isrcCode}</strong> / ${prsLabel} <strong>${prsCode}</strong> / ${iswcLabel} <strong>${iswcCode}</strong></div>
+                 <div class="isrc">${genreLabel} <strong>${genreTextLowercase}</strong></div>
+                 <div class="isrc">${moodLabel} <strong>${moodTextLowercase}</strong></div>
+             `;
+
             resultRow.appendChild(trackInfo);
 
-            // Audio Player
             const audio = document.createElement('audio');
             audio.controls = true;
-            audio.src = encodeURI(mp3Path);
-            audio.addEventListener('error', handleAudioError); // Add error handler
-            audio.addEventListener('play', handleAudioPlay); // Add play handler
+            audio.src = mp3Path;
+            audio.addEventListener('error', handleAudioError);
+            audio.addEventListener('play', handleAudioPlay);
             resultRow.appendChild(audio);
 
-            // Download Buttons
             const downloadButtons = document.createElement('div');
             downloadButtons.className = 'download-buttons';
-            downloadButtons.innerHTML = `
-                <a href="${encodeURI(mp3Path)}" download="${mp3File}" class="download-button" title="Download MP3">
-                    <img src="images/DownloadMP3.svg" alt="Download MP3">
-                </a>
-                <a href="${encodeURI(wavPath)}" download="${wavFile}" class="download-button" title="Download WAV">
-                    <img src="images/DownloadWAV.svg" alt="Download WAV">
-                </a>
-            `;
-            resultRow.appendChild(downloadButtons);
 
-            // Show Versions Button (only if ISRC exists)
+             const downloadMp3Title = translations?.modalDownloadMp3?.[currentLang] || translations?.modalDownloadMp3?.en || 'Download MP3';
+             const downloadWavTitle = translations?.modalDownloadWav?.[currentLang] || translations?.modalDownloadWav?.en || 'Download WAV';
+
+             // Download image paths need pathPrefix
+             downloadButtons.innerHTML = `
+             <a href="${mp3Path}" download="${mp3File}" class="download-button" title="${downloadMp3Title}">
+                 <img src="${getResourcePath('images', 'DownloadMP3.svg')}" alt="${downloadMp3Title}">
+             </a>
+             <a href="${wavPath}" download="${wavFile}" class="download-button" title="${downloadWavTitle}">
+                 <img src="${getResourcePath('images', 'DownloadWAV.svg')}" alt="${downloadWavTitle}">
+             </a>
+         `;
+         resultRow.appendChild(downloadButtons);
+
             if (isrcCode !== 'N/A') {
                 const showVersionsButton = document.createElement('button');
                 showVersionsButton.className = 'show-versions';
-                showVersionsButton.textContent = 'All Song Versions'; // Corrected text
+                showVersionsButton.textContent = translations?.showVersionsButton?.[currentLang] || translations?.showVersionsButton?.en || 'All Versions';
                 showVersionsButton.dataset.isrc = isrcCode;
-                showVersionsButton.addEventListener('click', showAllVersions); // Add listener directly
+                showVersionsButton.addEventListener('click', showAllVersions);
                 resultRow.appendChild(showVersionsButton);
             }
 
@@ -223,38 +477,33 @@ function displayResults() {
         });
     }
 
-    // addResultRowListeners(); // Listeners added directly now
     renderPaginationControls();
 }
 
-
-// Function to handle audio errors (simplified)
 function handleAudioError() {
-     console.error('Audio Error:', this.src, this.error);
-     // Optionally try WAV if MP3 failed
-     if (this.src.toLowerCase().endsWith('.mp3')) {
-         const wavSrc = this.src.replace(/mp3s\//i, '').replace(/\.mp3$/i, '.wav');
-         if (this.src !== wavSrc) { // Prevent infinite loop if replacement fails
-              console.log('Attempting WAV fallback:', wavSrc);
+     console.error('Search-logic: Audio Error:', this.src, this.error);
+     if (this.src.toLowerCase().includes('/mp3s/') && this.src.toLowerCase().endsWith('.mp3')) {
+         const wavSrc = this.src.replace(/\/MP3s\//i, '/').replace(/\.mp3$/i, '.wav');
+         console.log('Search-logic: Attempting WAV fallback:', wavSrc);
+         if (!this.dataset.originalSrc) {
+             this.dataset.originalSrc = this.src;
+         }
+         if (this.src !== wavSrc && !this.dataset.attemptedWav) {
+              this.dataset.attemptedWav = 'true';
               this.src = wavSrc;
-              // Error handler will trigger again if WAV also fails
-              return; // Don't mark as error yet
+              return;
          }
      }
-     // If it's already WAV or fallback didn't work, mark as error
      this.classList.add('audio-error');
-     // Maybe hide controls or show message? For now, just class.
-     // Example: Replace player with text
-     // const errorText = document.createElement('span');
-     // errorText.textContent = 'Audio unavailable';
-     // errorText.className = 'audio-error-text';
-     // this.parentNode.replaceChild(errorText, this);
+     const errorText = document.createElement('span');
+     errorText.textContent = 'Audio unavailable'; // Consider translating
+     errorText.className = 'audio-error-text';
+     this.parentNode.replaceChild(errorText, this);
 }
 
 
 function handleAudioPlay() {
-     // Pause other audio players (including modal players)
-     const allAudioPlayers = document.querySelectorAll('audio'); // Get all players on the page
+     const allAudioPlayers = document.querySelectorAll('audio');
      allAudioPlayers.forEach(p => {
         if (p !== this && !p.paused) {
             p.pause();
@@ -266,19 +515,24 @@ function renderPaginationControls() {
     const paginationContainer = document.getElementById('pagination-controls');
      if (!paginationContainer) return;
 
-    paginationContainer.innerHTML = ''; // Clear old controls
+    paginationContainer.innerHTML = '';
     const totalResults = currentResults.length;
     const totalPages = Math.ceil(totalResults / resultsPerPage);
 
-    if (totalPages <= 1) return; // No controls needed for 1 page or less
+    if (totalPages <= 1) return;
 
-    // Function to create page links/buttons
-    const createPageLink = (page, text = page, isActive = false, isDisabled = false) => {
-        const link = document.createElement('button'); // Use buttons for actions
+     const currentLang = window.getCurrentLanguage();
+     const translations = window.getTranslations();
+     const prevText = translations?.paginationPrevious?.[currentLang] || translations?.paginationPrevious?.en || 'Previous';
+     const nextText = translations?.paginationNext?.[currentLang] || translations?.paginationNext?.en || 'Next';
+
+
+    const createPageLink = (page, text, isActive = false, isDisabled = false) => {
+        const link = document.createElement('button');
         link.textContent = text;
         link.className = 'page-link';
         if (isActive) link.classList.add('active');
-        link.disabled = isDisabled; // Use disabled attribute
+        link.disabled = isDisabled;
 
         link.onclick = (e) => {
             e.preventDefault();
@@ -289,63 +543,53 @@ function renderPaginationControls() {
 
             if (newPage >= 1 && newPage <= totalPages) {
                  currentPage = newPage;
-                 displayResults(); // Re-render the results for the new page
-                 // Scroll to top of results
-                 const resultsTop = document.getElementById('results')?.offsetTop || 0;
-                 // Estimate header height or get dynamically if possible
-                 const headerHeight = document.getElementById('search-controls')?.offsetHeight + document.getElementById('menu-panel')?.offsetHeight + 20 || 150;
-                 window.scrollTo({ top: resultsTop - headerHeight, behavior: 'smooth' });
+                 displayResults();
+                 const scrollToElement = document.getElementById('search-controls') || document.getElementById('results');
+                 if (scrollToElement) {
+                      const offsetTop = scrollToElement.offsetTop;
+                      const buffer = 20;
+                      window.scrollTo({ top: offsetTop - buffer, behavior: 'smooth' });
+                 }
+
             }
         };
         return link;
     };
 
-    // Previous Button
-    paginationContainer.appendChild(createPageLink('prev', 'Previous', false, currentPage === 1));
+    paginationContainer.appendChild(createPageLink('prev', prevText, false, currentPage === 1));
 
-    // Page Number Buttons (with simplified ellipsis logic)
-    const maxPagesToShow = 5; // Adjust how many page numbers max
-    if (totalPages <= maxPagesToShow + 2) { // Show all if not too many pages
-        for (let i = 1; i <= totalPages; i++) {
-             paginationContainer.appendChild(createPageLink(i, i, i === currentPage));
+    const maxPagesToShow = 5;
+     let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+     let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+     if (endPage - startPage + 1 < maxPagesToShow) {
+         startPage = Math.max(1, endPage - maxPagesToShow + 1);
+     }
+
+    if (startPage > 1) {
+        paginationContainer.appendChild(createPageLink(1, '1', 1 === currentPage));
+        if (startPage > 2) {
+             const ellipsis = document.createElement('span');
+             ellipsis.textContent = '...';
+             ellipsis.className = 'page-ellipsis';
+             paginationContainer.appendChild(ellipsis);
         }
-    } else {
-        // Show first page
-        paginationContainer.appendChild(createPageLink(1, 1, 1 === currentPage));
+    }
 
-        // Ellipsis and middle pages
-        let startPage = Math.max(2, currentPage - 1);
-        let endPage = Math.min(totalPages - 1, currentPage + 1);
+    for (let i = startPage; i <= endPage; i++) {
+         paginationContainer.appendChild(createPageLink(i, i.toString(), i === currentPage));
+    }
 
-        if (currentPage > 3) { // Show ellipsis if needed before middle pages
-            const ellipsis = document.createElement('span');
-            ellipsis.textContent = '...';
-            ellipsis.className = 'page-ellipsis';
-            paginationContainer.appendChild(ellipsis);
-        }
-
-        // Adjust start/end if near beginning/end to show more pages
-        if (currentPage < 4) { endPage = Math.min(totalPages-1, 4); }
-        if (currentPage > totalPages - 3) { startPage = Math.max(2, totalPages - 3); }
-
-
-        for (let i = startPage; i <= endPage; i++) {
-              paginationContainer.appendChild(createPageLink(i, i, i === currentPage));
-        }
-
-        if (currentPage < totalPages - 2) { // Show ellipsis if needed after middle pages
+    if (endPage < totalPages) {
+         if (endPage < totalPages - 1) {
              const ellipsis = document.createElement('span');
              ellipsis.textContent = '...';
              ellipsis.className = 'page-ellipsis';
              paginationContainer.appendChild(ellipsis);
          }
+         paginationContainer.appendChild(createPageLink(totalPages, totalPages.toString(), totalPages === currentPage));
+     }
 
-        // Show last page
-        paginationContainer.appendChild(createPageLink(totalPages, totalPages, totalPages === currentPage));
-    }
-
-    // Next Button
-    paginationContainer.appendChild(createPageLink('next', 'Next', false, currentPage === totalPages));
+    paginationContainer.appendChild(createPageLink('next', nextText, false, currentPage === totalPages));
 }
 
 
@@ -358,160 +602,264 @@ function showAllVersions(event) {
     console.log('Search-logic: Showing versions for ISRC:', isrc);
     const modal = document.getElementById('versionsModal');
     const modalContent = modal?.querySelector('.modal-content');
-    if (!modal || !modalContent) {
-        console.error("Search-logic: Modal structure not found!");
+    const modalInfoContainer = modal?.querySelector('.modal-info'); // Get the container for versions
+
+    // Determine path prefix for local resources (images)
+    const isInLanguageFolder = /[\/\\][a-z]{2}[\/\\]/i.test(window.location.pathname);
+    const pathPrefix = isInLanguageFolder ? '../' : '';
+
+    if (!modal || !modalContent || !modalInfoContainer) {
+        console.error("Search-logic: Modal structure not found (modal, modal-content, or modal-info)!");
         return;
     }
 
-    // Find all tracks in the *other* dataset matching this ISRC
+    const currentLang = window.getCurrentLanguage();
+    const translations = window.getTranslations();
+
     const allTrackVersions = allVersionsData.filter(track => track['ISRC'] === isrc);
     console.log('Search-logic: Found versions in all_versions_data:', allTrackVersions.length);
 
     if (allTrackVersions.length > 0) {
-        const masterTrack = allTrackVersions[0]; // Assume first is representative
+        const masterTrack = allTrackVersions[0];
         const artworkFile = masterTrack.artwork || 'default_artwork.png';
-        const artworkPath = `Artwork/${artworkFile}`;
-        const masterTrackName = masterTrack['Master Track Name'] || masterTrack['Track Name'] || 'Track Versions';
+        // Artwork path needs pathPrefix
+        const artworkPath = `${pathPrefix}Artwork/${encodeURIComponent(artworkFile)}`;
+
+        const masterTrackName = masterTrack['Master Track Name'] || 'Track Versions';
         const artistName = masterTrack['Artist'] || 'Unknown Artist';
         const prsCode = masterTrack['PrsTunecodeFinal'] || 'N/A';
         const iswcCode = masterTrack['ISWC'] || 'N/A';
 
-        // Build modal HTML
-        modalContent.innerHTML = `
-            <button class="close" aria-label="Close modal">×</button>
-            <div class="modal-header-info">
-                <h2>All versions of "${masterTrackName}"</h2>
-                <div class="artist">Composer/Artist: <strong>${artistName}</strong> / ISRC: <strong>${isrc}</strong> / PRS Tunecode: <strong>${prsCode}</strong> / ISWC: <strong>${iswcCode}</strong></div>
-            </div>
-            <div class="modal-layout">
-                <div class="album-cover">
-                    <img src="${encodeURI(artworkPath)}" alt="Album Cover for ${masterTrackName}" onerror="this.onerror=null; this.src='images/default_artwork.png'; this.alt='Default album artwork';">
-                </div>
-                <div class="modal-info">
-                    <div id="modalVersions"></div>
-                </div>
-            </div>
-        `;
+        const allVersionsLabel = translations?.modalAllVersionsLabel?.[currentLang] || translations?.modalAllVersionsLabel?.en || 'All versions of';
+        const composerArtistLabel = translations?.artistLabel?.[currentLang] || translations?.artistLabel?.en || 'Composer/Artist:';
+        const isrcLabel = translations?.isrcLabel?.[currentLang] || translations?.isrcLabel?.en || 'ISRC:';
+        const prsLabel = translations?.prsTunecodeLabel?.[currentLang] || translations?.prsTunecodeLabel?.en || 'PRS Tunecode:';
+        const iswcLabel = translations?.iswcLabel?.[currentLang] || translations?.iswcLabel?.en || 'ISWC:';
 
-        const modalVersionsContainer = modalContent.querySelector('#modalVersions');
-        if(!modalVersionsContainer) return; // Should not happen
+        // --- Populate Modal Header and Artwork ---
+        const headerInfo = modalContent.querySelector('.modal-header-info');
+        const albumCoverContainer = modalContent.querySelector('.album-cover');
+
+        if (headerInfo) {
+            headerInfo.innerHTML = `
+                <button class="close" aria-label="Close modal">×</button>
+                <h2>${allVersionsLabel} "${masterTrackName}"</h2>
+                <div class="artist">${composerArtistLabel} <strong>${artistName}</strong> / ${isrcLabel} <strong>${isrc}</strong> / ${prsLabel} <strong>${prsCode}</strong> / ${iswcLabel} <strong>${iswcCode}</strong></div>
+            `;
+            // Re-attach close button listener
+            const closeButton = headerInfo.querySelector('.close');
+            if(closeButton) {
+                closeButton.onclick = closeModal;
+            }
+        }
+
+        if (albumCoverContainer) {
+            albumCoverContainer.innerHTML = `
+                <img src="${artworkPath}" alt="Album Cover for ${masterTrackName}" onerror="this.onerror=null; this.src='${pathPrefix}images/default_artwork.png'; this.alt='Default album artwork';">
+            `;
+        }
+
+        // --- Populate Versions List ---
+        modalInfoContainer.innerHTML = ''; // Clear previous versions
+
+        const downloadMp3Title = translations?.modalDownloadMp3?.[currentLang] || translations?.modalDownloadMp3?.en || 'Download MP3';
+        const downloadWavTitle = translations?.modalDownloadWav?.[currentLang] || translations?.modalDownloadWav?.en || 'Download WAV';
+        
+        // Download image paths need pathPrefix
+        const downloadImgPrefix = pathPrefix + 'images/';
 
         allTrackVersions.forEach(version => {
-            const versionTitle = version['Version'] || 'Main Version'; // Provide default
-            const wavFile = version['wav file name'] || `${masterTrackName} - ${versionTitle}.wav`; // Guess filename
-            const mp3File = wavFile.replace(/\.wav$/i, '.mp3'); // Guess filename
-            const mp3Path = `https://audio.8vbmusic.com/MP3s/${mp3File}`;
-            const wavPath = `https://audio.8vbmusic.com/${wavFile}`;
+            const versionTitle = typeof version.Version === 'object' ? (version.Version[currentLang] ?? version.Version.en ?? 'Version') : (version.Version || 'Version');
 
-            const versionDiv = document.createElement('div');
-            versionDiv.className = 'version-row';
-            versionDiv.innerHTML = `
-                <div class="track-name">${versionTitle}</div>
-                <audio controls src="${encodeURI(mp3Path)}"></audio>
-                <div class="download-buttons">
-                    <a href="${encodeURI(mp3Path)}" download="${mp3File}" class="download-button" title="Download MP3">
-                        <img src="images/DownloadMP3.svg" alt="Download MP3">
-                    </a>
-                    <a href="${encodeURI(wavPath)}" download="${wavFile}" class="download-button" title="Download WAV">
-                        <img src="images/DownloadWAV.svg" alt="Download WAV">
-                    </a>
+            // Length calculation remains the same
+            let lengthText = version.LENGTH;
+            if (typeof lengthText === 'string') {
+                try {
+                    if (lengthText.startsWith('1899-12-30T')) {
+                        const date = new Date(lengthText);
+                        const minutes = date.getUTCMinutes();
+                        const seconds = date.getUTCSeconds();
+                        lengthText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                } catch (e) {
+                    console.warn("Search-logic: Error parsing date string for length:", lengthText, e);
+                }
+            } else if (typeof lengthText === 'number') {
+                const minutes = Math.floor(lengthText / 60);
+                const seconds = Math.floor(lengthText % 60);
+                lengthText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                lengthText = 'N/A';
+            }
+
+            const wavFile = version['wav file name'] || `${masterTrackName} - ${versionTitle}.wav`;
+            const mp3File = wavFile.replace(/\.wav$/i, '.mp3');
+            const mp3Path = `https://audio.8vbmusic.com/MP3s/${encodeURIComponent(mp3File)}`;
+            const wavPath = `https://audio.8vbmusic.com/${encodeURIComponent(wavFile)}`;
+
+            // Create a div for each version instead of table rows
+            const versionRow = document.createElement('div');
+            versionRow.className = 'version-row';
+
+            versionRow.innerHTML = `
+                <div class="version-name">${versionTitle}</div>
+                <div class="version-actions">
+                    <audio controls src="${mp3Path}"></audio>
+                    <div class="download-buttons">
+                        <a href="${mp3Path}" download="${mp3File}" class="download-button" title="${downloadMp3Title}">
+                            <img src="${downloadImgPrefix}DownloadMP3.svg" alt="${downloadMp3Title}">
+                        </a>
+                        <a href="${wavPath}" download="${wavFile}" class="download-button" title="${downloadWavTitle}">
+                            <img src="${downloadImgPrefix}DownloadWAV.svg" alt="${downloadWavTitle}">
+                        </a>
+                    </div>
                 </div>
             `;
-            modalVersionsContainer.appendChild(versionDiv);
+            modalInfoContainer.appendChild(versionRow);
 
-            const modalAudio = versionDiv.querySelector('audio');
+            const modalAudio = versionRow.querySelector('audio');
             if (modalAudio) {
-                 modalAudio.addEventListener('error', handleAudioError); // Reuse same error handler
-                 modalAudio.addEventListener('play', handleAudioPlay); // Reuse same play handler
-             }
+                modalAudio.addEventListener('error', handleAudioError);
+                modalAudio.addEventListener('play', handleAudioPlay);
+            }
         });
 
-        // Show modal and add close listeners AFTER content is built
         modal.style.display = 'block';
-        const closeButton = modal.querySelector('.close');
-        if(closeButton) {
-            closeButton.onclick = closeModal;
-        }
-        // Close on outside click (listener added once below)
+        // Close button listener is attached above when header is populated
 
     } else {
         console.warn('Search-logic: No versions found in all_versions_data for ISRC:', isrc);
-        alert("No alternative versions found for this track."); // Simple feedback
+        const noVersionsMessage = translations?.noVersionsFound?.[currentLang] || translations?.noVersionsFound?.en || "No alternative versions found for this track.";
+        alert(noVersionsMessage);
     }
+}
+
+function openVersionsModal(track) {
+    const modal = document.getElementById('versionsModal');
+    const modalContent = document.getElementById('versionsModalContent');
+    
+    if (!modal || !modalContent) {
+        console.error("Search-logic: Modal elements not found!");
+        return;
+    }
+    
+    // Clear previous content
+    modalContent.innerHTML = '';
+    
+    // Get all versions for this track
+    const masterTrackName = track['Master Track Name'];
+    const trackVersions = allVersionsData.filter(version => 
+        version['Master Track Name'] === masterTrackName
+    );
+    
+    const currentLang = window.getCurrentLanguage();
+    const translations = window.getTranslations();
+    
+    // Create header
+    const header = document.createElement('h2');
+    const allVersionsText = translations?.allVersionsOf?.[currentLang] || 
+                           translations?.allVersionsOf?.en || 
+                           'All Versions of';
+    header.textContent = `${allVersionsText} "${masterTrackName}"`;
+    modalContent.appendChild(header);
+    
+    // Create version list
+    trackVersions.forEach(version => {
+        const versionName = typeof version.Version === 'object' ? 
+                           (version.Version[currentLang] ?? version.Version.en) : 
+                           version.Version;
+        
+        const versionItem = document.createElement('div');
+        versionItem.className = 'version-item';
+        versionItem.innerHTML = `
+            <div class="version-name">${versionName}</div>
+            <div class="version-isrc">ISRC: ${version.ISRC || 'N/A'}</div>
+        `;
+        
+        // Add play button if audio file exists
+        if (version['wav file name']) {
+            const playButton = document.createElement('button');
+            playButton.className = 'play-version-button';
+            playButton.textContent = translations?.playText?.[currentLang] || 
+                                    translations?.playText?.en || 
+                                    'Play';
+            
+            const mp3File = version['wav file name'].replace(/\.wav$/i, '.mp3');
+            const mp3Path = `https://audio.8vbmusic.com/MP3s/${encodeURIComponent(mp3File)}`;
+            
+            playButton.onclick = () => {
+                const audioPlayer = document.getElementById('modalAudioPlayer');
+                if (audioPlayer) {
+                    audioPlayer.src = mp3Path;
+                    audioPlayer.play();
+                }
+            };
+            
+            versionItem.appendChild(playButton);
+        }
+        
+        modalContent.appendChild(versionItem);
+    });
+    
+    // Add audio player to modal
+    const audioPlayer = document.createElement('audio');
+    audioPlayer.id = 'modalAudioPlayer';
+    audioPlayer.controls = true;
+    modalContent.appendChild(audioPlayer);
+    
+    // Show the modal
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    const modal = document.getElementById('versionsModal');
+    const audioPlayer = document.getElementById('modalAudioPlayer');
+    
+    if (modal) modal.style.display = 'none';
+    if (audioPlayer) audioPlayer.pause();
 }
 
 function closeModal() {
     const modal = document.getElementById('versionsModal');
     if (modal) {
-        // Pause any audio playing inside the modal before closing
         const modalAudioPlayers = modal.querySelectorAll('audio');
         modalAudioPlayers.forEach(p => p.pause());
         modal.style.display = 'none';
-        modal.querySelector('.modal-content').innerHTML = ''; // Clear content
+         // Clear only the versions list, keep the structure
+         const modalInfoContainer = modal.querySelector('.modal-info');
+         if (modalInfoContainer) {
+             modalInfoContainer.innerHTML = '';
+         }
+         // Optionally clear header/artwork too if needed, but often better to repopulate
+         // const headerInfo = modal.querySelector('.modal-header-info');
+         // const albumCoverContainer = modal.querySelector('.album-cover');
+         // if (headerInfo) headerInfo.innerHTML = '<button class="close" aria-label="Close modal">×</button>'; // Keep close button structure
+         // if (albumCoverContainer) albumCoverContainer.innerHTML = '';
     }
 }
 
-// --- Initial Load & Event Setup for search.html ---
+
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Search-logic.js DOMContentLoaded"); // Debugging
+    console.log("Search-logic.js DOMContentLoaded");
 
-    // Make sure elements exist on this page before adding listeners
-    const searchInput = document.getElementById('search-input');
-    const sortSelect = document.getElementById('sort-select');
-    const resultsContainer = document.getElementById('results'); // Needed for initial check
-    const modal = document.getElementById('versionsModal'); // Needed for outside click listener
+     window.translationsLoaded.then(() => {
+         console.log("Search-logic: Translations loaded. Starting search setup.");
+         loadMusicDataAndSetupSearch().catch(error => {
+             console.error("Search-logic: Error during data load sequence after translation wait:", error);
+         });
 
-    if (!resultsContainer) {
-        console.log("Search-logic: Not on the search page (no 'results' element). Exiting setup.");
-        return; // Don't run search logic if not on search page
-    }
+     }).catch(error => {
+         console.error("Search-logic: Error waiting for translations:", error);
+         const resultsContainer = document.getElementById('results');
+          const translations = window.getTranslations();
+          const currentLang = window.getCurrentLanguage();
+          const errorMessage = translations?.dataLoadError?.[currentLang] || translations?.dataLoadError?.en || 'Error loading music data.';
 
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce(search, 300)); // Add debounce to search input
-    } else {
-        console.warn("Search-logic: Search input not found.");
-    }
+         if (resultsContainer) {
+              resultsContainer.innerHTML = `<p style="color: red; text-align: center; margin-top: 30px;">${errorMessage}</p>`;
+         } else {
+              console.error("Search-logic: Results container not found. Cannot display error message.");
+         }
+     });
 
-    if (sortSelect) {
-        sortSelect.addEventListener('change', sortAndDisplayResults);
-    } else {
-        console.warn("Search-logic: Sort select not found.");
-    }
-
-    // Modal close on outside click listener
-    if (modal) {
-        window.addEventListener('click', (event) => {
-            if (event.target == modal) { // Click was directly on the modal background
-                closeModal();
-            }
-        });
-    }
-
-
-    // Check for album query parameter from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const albumQuery = urlParams.get('album');
-
-    // Load data and perform initial search/display
-    loadMusicData().then(() => {
-        if (albumQuery) {
-            const decodedAlbumQuery = decodeURIComponent(albumQuery);
-            console.log(`Search-logic: Searching for album from URL: ${decodedAlbumQuery}`);
-            if(searchInput) {
-                 searchInput.value = `Album: "${decodedAlbumQuery}"`; // Display filter
-            }
-             // Perform the actual filtering based on the query
-             currentResults = mainMusicData.filter(track => track.Album === decodedAlbumQuery);
-             currentPage = 1;
-             sortAndDisplayResults(); // Display filtered results
-        } else {
-            // No album query, perform default search (shows all initially)
-            console.log('Search-logic: Initial display...');
-            search(); // Call search with potentially empty term
-        }
-    }).catch(error => {
-        // Catch errors from loadMusicData promise itself
-        console.error("Search-logic: Error during initial data load sequence:", error);
-    });
-
-}); // End DOMContentLoaded for search-logic.js
+});

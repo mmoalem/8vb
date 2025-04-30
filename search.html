@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"> <!-- lang attribute will be set by common.js -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Title and meta tags need manual translation in fr/search.html -->
     <title>Search, Audition & Download Production Music | 8vb Music Library</title>
 	<meta name="description" content="Browse, search, audiotion and download high-quality production music tracks from the 8vb Music library. Easily find the perfect music for your film, TV, game, or project. Listen now!">
 
-<link rel="stylesheet" href="style.css">
+    <!-- Path to style.css needs to be relative -->
+    <link rel="stylesheet" href="style.css"> <!-- Use "style.css" for root EN -->
+    <!-- For fr/search.html, this should be: <link rel="stylesheet" href="../style.css"> -->
 
 </head>
 
-<body>
+<body class="page-search">
 
     <!-- Top Bar - Fixed container (BACKGROUND ONLY) -->
     <div id="top-bar">
@@ -19,34 +22,59 @@
 
     <!-- Logo Container - Fixed Top Left (ONLY ONCE) -->
     <div id="logo-container">
-        <img src="images/logo.jpg" alt="Logo">
+        <!-- Link href should be relative to current page's index -->
+         <!-- Path to logo needs to be relative -->
+        <a href="index.html"><img src="images/logo.jpg" alt="Logo 8vb Music"></a> <!-- Use "index.html" and "images/..." for root EN -->
+         <!-- For fr/search.html: <a href="./index.html"><img src="../images/logo.jpg" alt="Logo 8vb Music"></a> -->
     </div>
+
+
 
     <!-- Menu Panel - Fixed -->
     <div id="menu-panel">
         <nav>
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="search.html">Search Music</a></li>
-                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
-                <li><a href="contact.html">Contact Us</a></li>
-				<li><a href="Terms.html">Legal</a></li>
-
+                 <!-- Link hrefs should be relative -->
+                <li><a href="index.html" data-translate="navHome">Home</a></li> <!-- Use "index.html" for root EN -->
+                <li><a href="search.html" data-translate="navSearch">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html" data-translate="navMetadata">Search Metadata</a></li>
+                <li><a href="contact.html" data-translate="navContact">Contact Us</a></li>
+				<li><a href="Terms.html" data-translate="navLegal">Legal</a></li>
+                 <!-- For fr/search.html, hrefs should be: ./index.html, ./search.html, etc. -->
+                 <!-- Language Selector - Desktop Dropdown -->
+                <li class="language-menu-item">
+                    <span class="current-language" aria-haspopup="true" aria-expanded="false">
+                         <!-- Flag path needs to be relative -->
+                         <img src="images/flags/fr.svg" alt="French Flag" class="flag-icon"> FR <!-- Use "images/..." for root EN -->
+                         <!-- For fr/search.html: <img src="../images/..." -->
+                    </span>
+                    <ul class="language-dropdown">
+                         <li><a href="#" data-lang="en"><img src="images/flags/gb.svg" alt="English Flag" class="flag-icon"> <span data-translate="langEN">EN</span></a></li>
+                         <li><a href="#" data-lang="fr"><img src="images/flags/fr.svg" alt="French Flag" class="flag-icon"> <span data-translate="langFR">FR</span></a></li>
+                         <li><a href="#" data-lang="de"><img src="images/flags/de.svg" alt="German Flag" class="flag-icon"> <span data-translate="langDE">DE</span></a></li>
+                         <li><a href="#" data-lang="es"><img src="images/flags/es.svg" alt="Spanish Flag" class="flag-icon"> <span data-translate="langES">ES</span></a></li>
+                         <li><a href="#" data-lang="it"><img src="images/flags/it.svg" alt="Italian Flag" class="flag-icon"> <span data-translate="langIT">IT</span></a></li>
+                         <!-- Add other languages here -->
+                    </ul>
+                </li>
             </ul>
         </nav>
     </div>
 
     <!-- Search Controls Panel (Search.html ONLY) - Fixed -->
     <div id="search-controls">
-        <input type="text" id="search-input" placeholder="Search by genre, instrument, keyword, mood">
+         <!-- Add data-translate-placeholder -->
+        <input type="text" id="search-input" placeholder="Search by genre, instrument, keyword, mood" data-translate-placeholder="searchPlaceholder">
         <div class="sort-container">
-            <span class="sort-label">Show results:</span>
+             <!-- Add data-translate -->
+            <span class="sort-label" data-translate="showResultsLabel">Show results:</span>
+             <!-- Add data-translate to options -->
             <select id="sort-select">
-                <option value="alphabetical-asc">Alphabetically (A-Z)</option>
-                <option value="alphabetical-desc">Alphabetically (Z-A)</option>
-                <option value="isrc-asc">Oldest First</option>
-                <option value="isrc-desc">Most Recent</option>
-                <option value="random">Random Order</option>
+                <option value="alphabetical-asc" data-translate="sortAlphabeticalAsc">Alphabetically (A-Z)</option>
+                <option value="alphabetical-desc" data-translate="sortAlphabeticalDesc">Alphabetically (Z-A)</option>
+                <option value="isrc-asc" data-translate="sortOldestFirst">Oldest First</option>
+                <option value="isrc-desc" data-translate="sortMostRecent">Most Recent</option>
+                <option value="random" data-translate="sortRandom">Random Order</option>
             </select>
         </div>
     </div>
@@ -61,13 +89,19 @@
     <!-- Mobile Menu Container -->
     <div id="mobile-menu" aria-hidden="true">
         <nav>
-            <!-- Copy or move the same menu links here -->
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="search.html">Search Music</a></li>
-                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
-                <li><a href="contact.html">Contact Us</a></li>
-				<li><a href="Terms.html">Legal</a></li>
+                <!-- Link hrefs and data-translate should match desktop -->
+                <li><a href="index.html" data-translate="navHome">Home</a></li>
+                <li><a href="search.html" data-translate="navSearch">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html" data-translate="navMetadata">Search Metadata</a></li>
+                <li><a href="contact.html" data-translate="navContact">Contact Us</a></li>
+				<li><a href="Terms.html" data-translate="navLegal">Legal</a></li>
+                 <!-- Mobile language items added in common.js -->
+                <li class="mobile-lang-item"><a href="#" data-lang="en" data-translate="langEN">EN</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="fr" data-translate="langFR">FR</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="de" data-translate="langDE">DE</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="es" data-translate="langES">ES</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="it" data-translate="langIT">IT</a></li>
             </ul>
         </nav>
     </div>
@@ -80,27 +114,65 @@
     <!-- Modal for showing all versions -->
     <div id="versionsModal" class="modal">
         <div class="modal-content">
-            <!-- Correct Modal Structure will be injected by JS -->
+            <!-- Content structure here, actual text/data injected by JS -->
+            <!-- The data-translate attributes for the table headers are correctly placed in the JS -->
+             <div class="modal-header-info">
+                <span class="close">&times;</span>
+                <h2 id="modal-track-name"></h2> <!-- JS will populate, keep as is -->
+                <div class="artist" id="modal-artist"></div> <!-- JS will populate, keep as is -->
+            </div>
+            <div class="modal-layout">
+                <div class="album-cover">
+                    <!-- Image src/alt will be set by JS -->
+                    <img src="" alt="Album Cover" id="modal-album-artwork">
+                </div>
+                <div class="modal-info">
+                    <!-- JS will inject track versions table here -->
+                     <table id="modalVersions">
+                         <thead>
+                             <tr>
+                                 <!-- These data-translate attributes are added by JS in search-logic.js -->
+                                 <th>Version</th>
+                                 <th>Durée</th>
+                                 <th>ISRC</th>
+                                 <th>ISWC</th>
+                                 <th>Tunecode</th>
+                                 <th>Actions</th>
+                             </tr>
+                         </thead>
+                         <tbody>
+                            <!-- JS will populate -->
+                         </tbody>
+                     </table>
+                </div>
+            </div>
         </div>
     </div>
 
 
 	<footer id="page-footer">
         <div class="footer-content">
-            <p>© 2024 8vb Music. All Rights Reserved.</p> <!-- Updated year -->
+             <!-- Add data-translate -->
+            <p data-translate="footerCopyright">© 2024 8vb Music. All Rights Reserved.</p> <!-- Updated year -->
             <nav class="footer-legal-nav">
-                 <a href="Terms.html#terms-of-service-main">Terms of Service</a>
+                 <!-- Add data-translate and ensure relative links -->
+                 <a href="Terms.html#terms-of-service-main" data-translate="footerTerms">Terms of Service</a>
                  <span>|</span> <!-- Separator -->
-                 <a href="Terms.html#privacy-policy">Privacy Policy</a>
+                 <a href="Terms.html#privacy-policy" data-translate="footerPrivacy">Privacy Policy</a>
                  <span>|</span> <!-- Separator -->
-                 <a href="Terms.html#cookie-statement">Cookie Policy</a>
+                 <a href="Terms.html#cookie-statement" data-translate="footerCookies">Cookie Policy</a>
+                 <!-- For fr/search.html, hrefs should be: ./Terms.html#... -->
             </nav>
         </div>
     </footer>
-	
-	
-		<script src="js/common.js" defer></script>
-        <script src="js/search-logic.js" defer></script> 
+
+    <!-- Script paths need to be relative -->
+	<script src="js/common.js" defer></script> <!-- Use "js/..." for root EN -->
+    <script src="js/search-logic.js" defer></script> <!-- Use "js/..." for root EN -->
+    <!-- For fr/search.html, these should be:
+    <script src="../js/common.js" defer></script>
+    <script src="../js/search-logic.js" defer></script> -->
+
 
 </body>
 </html>

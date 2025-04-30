@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON File Splitter, Merger, and Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, button {
+            margin-bottom: 15px;
+            padding: 8px;
+        }
+        input[type="number"] {
+            width: 100px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 10px 15px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        #downloadLinks {
+            margin-top: 20px;
+        }
+        a {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 12px;
+            background-color: #337ab7;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        a:hover {
+            background-color: #286090;
+        }
+    </style>
+</head>
+<body>
+    <h1>JSON File Splitter, Merger, and Counter</h1>
+    <div class="container">
+        <div>
+            <label for="jsonFile">Select JSON File(s):</label>
+            <input type="file" id="jsonFile" accept=".json" multiple>
+        </div>
+        <div>
+            <label for="recordsPerFile">Records Per File:</label>
+            <input type="number" id="recordsPerFile" min="1" value="5">
+        </div>
+        <button id="splitButton">Split JSON File</button>
+        <button id="mergeButton">Merge JSON Files</button>
+        <button id="countButton">Count Records</button>
+        <div id="status"></div>
+        <div id="downloadLinks"></div>
+    </div>
+
+    <script>
+        document.getElementById('splitButton').addEventListener('click', splitJsonFile);
+        document.getElementById('mergeButton').addEventListener('click', mergeJsonFiles);
+        document.getElementById('countButton').addEventListener('click', countJsonRecords);
+
+        function splitJsonFile() {
+            const fileInput = document.getElementById('jsonFile');
+            const recordsPerFile = parseInt(document.getElementById('recordsPerFile').value);
+            const statusDiv = document.getElementById('status');
+            const downloadLinksDiv = document.getElementById('downloadLinks');
+            
+            // Clear previous results
+            statusDiv.innerHTML = '';
+            statusDiv.className = '';
+            downloadLinksDiv.innerHTML = '';
+            
+            // Validate input
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showError('Please select a JSON file');
+                return;
+            }
+            
+            if (isNaN(recordsPerFile) || recordsPerFile < 1) {
+                showError('Please enter a valid number of records per file');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+                try {
+                    // Parse the JSON file
+                    const jsonData = JSON.parse(event.target.result);
+                    
+                    // Check if the input is an array
+                    if (!Array.isArray(jsonData)) {
+                        showError('Error: Input JSON is not an array');
+                        return;
+                    }
+                    
+                    const totalRecords = jsonData.length;
+                    const totalFiles = Math.ceil(totalRecords / recordsPerFile);
+                    
+                    statusDiv.innerHTML = `
+                        <p>Total records: ${totalRecords}</p>
+                        <p>Records per file: ${recordsPerFile}</p>
+                        <p>Total files to be created: ${totalFiles}</p>
+                    `;
+                    statusDiv.className = 'success';
+                    
+                    // Split the data and create download links
+                    for (let i = 0; i < totalFiles; i++) {
+                        const start = i * recordsPerFile;
+                        const end = Math.min(start + recordsPerFile, totalRecords);
+                        const chunk = jsonData.slice(start, end);
+                        
+                        // Create a download link for this chunk
+                        const fileName = `part_${i + 1}.json`;
+                        const jsonStr = JSON.stringify(chunk, null, 2);
+                        const blob = new Blob([jsonStr], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = fileName;
+                        link.textContent = `Download ${fileName} (${chunk.length} records)`;
+                        downloadLinksDiv.appendChild(link);
+                        downloadLinksDiv.appendChild(document.createElement('br'));
+                    }
+                    
+                } catch (error) {
+                    showError(`Error processing JSON file: ${error.message}`);
+                }
+            };
+            
+            reader.onerror = function() {
+                showError('Error reading the file');
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function mergeJsonFiles() {
+            const fileInput = document.getElementById('jsonFile');
+            const statusDiv = document.getElementById('status');
+            const downloadLinksDiv = document.getElementById('downloadLinks');
+            
+            // Clear previous results
+            statusDiv.innerHTML = '';
+            statusDiv.className = '';
+            downloadLinksDiv.innerHTML = '';
+            
+            // Validate input
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showError('Please select JSON files to merge');
+                return;
+            }
+            
+            let mergedData = [];
+            let filesProcessed = 0;
+            
+            Array.from(fileInput.files).forEach(file => {
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    try {
+                        // Parse the JSON file
+                        const jsonData = JSON.parse(event.target.result);
+                        
+                        // Check if the input is an array
+                        if (!Array.isArray(jsonData)) {
+                            showError('Error: One of the input JSON files is not an array');
+                            return;
+                        }
+                        
+                        // Merge data
+                        mergedData = mergedData.concat(jsonData);
+                        filesProcessed++;
+                        
+                        // Check if all files are processed
+                        if (filesProcessed === fileInput.files.length) {
+                            const fileName = 'merged.json';
+                            const jsonStr = JSON.stringify(mergedData, null, 2);
+                            const blob = new Blob([jsonStr], { type: 'application/json' });
+                            const url = URL.createObjectURL(blob);
+                            
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = fileName;
+                            link.textContent = `Download ${fileName} (${mergedData.length} records)`;
+                            downloadLinksDiv.appendChild(link);
+                            downloadLinksDiv.appendChild(document.createElement('br'));
+                            
+                            statusDiv.innerHTML = `<p>Merged ${filesProcessed} files successfully!</p>`;
+                            statusDiv.className = 'success';
+                        }
+                        
+                    } catch (error) {
+                        showError(`Error processing JSON file: ${error.message}`);
+                    }
+                };
+                
+                reader.onerror = function() {
+                    showError('Error reading the file');
+                };
+                
+                reader.readAsText(file);
+            });
+        }
+
+        function countJsonRecords() {
+            const fileInput = document.getElementById('jsonFile');
+            const statusDiv = document.getElementById('status');
+            
+            // Clear previous results
+            statusDiv.innerHTML = '';
+            statusDiv.className = '';
+            
+            // Validate input
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showError('Please select a JSON file to count records');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+                try {
+                    // Parse the JSON file
+                    const jsonData = JSON.parse(event.target.result);
+                    
+                    // Check if the input is an array
+                    if (!Array.isArray(jsonData)) {
+                        showError('Error: Input JSON is not an array');
+                        return;
+                    }
+                    
+                    const totalRecords = jsonData.length;
+                    statusDiv.innerHTML = `<p>Total records in the file: ${totalRecords}</p>`;
+                    statusDiv.className = 'success';
+                    
+                } catch (error) {
+                    showError(`Error processing JSON file: ${error.message}`);
+                }
+            };
+            
+            reader.onerror = function() {
+                showError('Error reading the file');
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        function showError(message) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'error';
+        }
+    </script>
+</body>
+</html>

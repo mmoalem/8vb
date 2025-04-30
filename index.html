@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"> <!-- lang attribute will be set by common.js -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title and meta tags need manual translation in fr/index.html -->
     <title>8vb Music - Production Music Library in London | PRS & MCPS</title>
 	<meta name="description" content="Home page for 8vb Music, a PRS and MCPS registered, production music library. Based in London, GB, it offers high-quality, easily licensable music for video games, broadcast, film and any other project requiring unique, top-quality background music">
     <meta name="keywords" content="music, production music, television, film, games, broadcast, b2b, music library, epic orchestral music, minimalist piano music, uplifting music, sad cinematic score, film score, music for advertising, Documentaries Background music, PRS music library, MCPS license music, roduction music license">
-    <link rel="stylesheet" href="style.css">
+    <!-- Path to style.css needs to be relative to the HTML file location -->
+    <link rel="stylesheet" href="style.css"> <!-- Use "style.css" for root EN -->
+    <!-- For fr/index.html, this should be: <link rel="stylesheet" href="../style.css"> -->
 </head>
 <body>
 
@@ -15,18 +18,44 @@
 
     <!-- Logo Container - Fixed Top Left (ONLY ONCE) -->
     <div id="logo-container">
-        <img src="images/logo.jpg" alt="Logo">
+         <!-- Path to logo needs to be relative -->
+        <img src="images/logo.jpg" alt="Logo"> <!-- Use "images/logo.jpg" for root EN -->
+        <!-- For fr/index.html, this should be: <img src="../images/logo.jpg" alt="Logo"> -->
     </div>
+
+
+
 
     <!-- Menu Panel - Fixed -->
     <div id="menu-panel">
         <nav>
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="search.html">Search Music</a></li>
-                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
-                <li><a href="contact.html">Contact Us</a></li>
-                <li><a href="Terms.html">Legal</a></li>
+                <!-- Link hrefs should be relative to the current page -->
+                <li><a href="index.html" data-translate="navHome">Home</a></li> <!-- Use "index.html" for root EN -->
+                <li><a href="search.html" data-translate="navSearch">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html" data-translate="navMetadata">Search Metadata</a></li>
+                <li><a href="contact.html" data-translate="navContact">Contact Us</a></li>
+                <li><a href="Terms.html" data-translate="navLegal">Legal</a></li>
+                 <!-- For fr/index.html, hrefs should be:
+                 <li><a href="./index.html" data-translate="navHome">Accueil</a></li>
+                 <li><a href="./search.html" data-translate="navSearch">Rechercher de la Musique</a></li>
+                 ... etc. -->
+                 <!-- Language Selector - Desktop Dropdown -->
+                <li class="language-menu-item">
+                    <span class="current-language" aria-haspopup="true" aria-expanded="false">
+                         <!-- Flag path needs to be relative -->
+                         <img src="images/flags/fr.svg" alt="French Flag" class="flag-icon"> FR <!-- Use "images/..." for root EN -->
+                         <!-- For fr/index.html: <img src="../images/..." -->
+                    </span>
+                    <ul class="language-dropdown">
+                         <li><a href="#" data-lang="en"><img src="images/flags/gb.svg" alt="English Flag" class="flag-icon"> <span data-translate="langEN">EN</span></a></li>
+                         <li><a href="#" data-lang="fr"><img src="images/flags/fr.svg" alt="French Flag" class="flag-icon"> <span data-translate="langFR">FR</span></a></li>
+                         <li><a href="#" data-lang="de"><img src="images/flags/de.svg" alt="German Flag" class="flag-icon"> <span data-translate="langDE">DE</span></a></li>
+                         <li><a href="#" data-lang="es"><img src="images/flags/es.svg" alt="Spanish Flag" class="flag-icon"> <span data-translate="langES">ES</span></a></li>
+                         <li><a href="#" data-lang="it"><img src="images/flags/it.svg" alt="Italian Flag" class="flag-icon"> <span data-translate="langIT">IT</span></a></li>
+                         <!-- Add other languages here -->
+                    </ul>
+                </li>
             </ul>
         </nav>
     </div>
@@ -41,13 +70,19 @@
     <!-- Mobile Menu Container -->
     <div id="mobile-menu" aria-hidden="true">
         <nav>
-            <!-- Copy or move the same menu links here -->
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="search.html">Search Music</a></li>
-                <li><a href="cue-sheet-metadata.html">Search Metadata</a></li>
-                <li><a href="contact.html">Contact Us</a></li>
-				<li><a href="Terms.html">Legal</a></li>
+                 <!-- Link hrefs and data-translate should match desktop -->
+                <li><a href="index.html" data-translate="navHome">Home</a></li>
+                <li><a href="search.html" data-translate="navSearch">Search Music</a></li>
+                <li><a href="cue-sheet-metadata.html" data-translate="navMetadata">Search Metadata</a></li>
+                <li><a href="contact.html" data-translate="navContact">Contact Us</a></li>
+				<li><a href="Terms.html" data-translate="navLegal">Legal</a></li>
+                <!-- Mobile language items added in common.js -->
+                <li class="mobile-lang-item"><a href="#" data-lang="en" data-translate="langEN">EN</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="fr" data-translate="langFR">FR</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="de" data-translate="langDE">DE</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="es" data-translate="langES">ES</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="it" data-translate="langIT">IT</a></li>
             </ul>
         </nav>
     </div>
@@ -60,24 +95,31 @@
 
         <!-- Top Row of Featured Albums -->
         <div class="featured-albums">
-            
+
             <div class="album-grid" id="top-album-grid">
-                <p>Loading albums...</p>
+                <!-- Loading message will be translated by JS -->
+                <p data-translate="indexLoadingAlbums">Loading albums...</p>
             </div>
         </div>
 
         <!-- Central Content Block -->
         <div class="home-welcome-content">
-            <h1>Welcome to 8vb Music production music library</h1>
-            <p>
+            <!-- Add data-translate to heading and paragraphs -->
+            <h1 data-translate="indexWelcomeHeading">Welcome to 8vb Music production music library</h1>
+            <p data-translate="indexWelcomePara1">
                 Founded by musicians and video editors, our catalogue aims to address the requirements we encountered working in TV and Film post-production. However, our versatile music fits perfectly into any media project – games, podcasts, online content, and more. Our goal is to build a dynamic catalogue of distinctive music cues that are still easy to place into any edit timeline.
-                <br><br>
-                8vb Music is registered with <b>PRS/MCPS</b> and operate under the standard <b>PRS/MCPS</b> licensing, ensuring a straightforward clearance process for professional use worldwide, giving you peace of mind.
-                <br><br>
-                Explore our collection: You can search, audition, and download high-quality production music directly from our catalogue. Click any album cover on this page to browse its tracks, or <a href="search.html">search</a> our entire collection by keywords, genre, mood, instrumentation, and more.
-                <br><br>
-                Stems, cut-downs, and alternative mixes are available for most tracks. If you need these specific versions, please don't hesitate to <a href="contact.html">contact us</a> with your requirements.
             </p>
+            <p data-translate="indexWelcomePara2">
+                 8vb Music is registered with <b>PRS/MCPS</b> and operate under the standard <b>PRS/MCPS</b> licensing, ensuring a straightforward clearance process for professional use worldwide, giving you peace of mind.
+             </p>
+            <p data-translate="indexWelcomePara3">
+                 Explore our collection: You can search, audition, and download high-quality production music directly from our catalogue. Click any album cover on this page to browse its tracks, or <a href="search.html">search</a> our entire collection by keywords, genre, mood, instrumentation, and more.
+                 <!-- Note: The <a> tags inside this paragraph will be handled by the HTML in the translations.json file -->
+            </p>
+            <p data-translate="indexWelcomePara4">
+                 Stems, cut-downs, and alternative mixes are available for most tracks. If you need these specific versions, please don't hesitate to <a href="contact.html">contact us</a> with your requirements.
+                  <!-- Note: The <a> tags inside this paragraph will be handled by the HTML in the translations.json file -->
+             </p>
         </div>
 
         <!-- Bottom Rows of Featured Albums -->
@@ -91,19 +133,26 @@
 
 	<footer id="page-footer">
         <div class="footer-content">
-            <p>© 2024 8vb Music. All Rights Reserved.</p> <!-- Updated year -->
+             <!-- Add data-translate -->
+            <p data-translate="footerCopyright">© 2024 8vb Music. All Rights Reserved.</p> <!-- Updated year -->
             <nav class="footer-legal-nav">
-                 <a href="Terms.html#terms-of-service-main">Terms of Service</a>
+                 <!-- Add data-translate and ensure relative links -->
+                 <a href="Terms.html#terms-of-service-main" data-translate="footerTerms">Terms of Service</a>
                  <span>|</span> <!-- Separator -->
-                 <a href="Terms.html#privacy-policy">Privacy Policy</a>
+                 <a href="Terms.html#privacy-policy" data-translate="footerPrivacy">Privacy Policy</a>
                  <span>|</span> <!-- Separator -->
-                 <a href="Terms.html#cookie-statement">Cookie Policy</a>
+                 <a href="Terms.html#cookie-statement" data-translate="footerCookies">Cookie Policy</a>
+                 <!-- For fr/index.html, hrefs should be: ./Terms.html#... -->
             </nav>
         </div>
     </footer>
 
-   <script src="js/common.js" defer></script>
-<script src="js/index-logic.js" defer></script>
+    <!-- Script paths need to be relative -->
+   <script src="js/common.js" defer></script> <!-- Use "js/..." for root EN -->
+   <script src="js/index-logic.js" defer></script> <!-- Use "js/..." for root EN -->
+   <!-- For fr/index.html, these should be:
+   <script src="../js/common.js" defer></script>
+   <script src="../js/index-logic.js" defer></script> -->
 
 </body>
 </html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to TSV Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .input-section, .output-section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #fileInput {
+            display: none;
+        }
+        .file-upload {
+            background-color: #2196F3;
+        }
+        .file-upload:hover {
+            background-color: #0b7dda;
+        }
+        .download-btn {
+            background-color: #ff9800;
+        }
+        .download-btn:hover {
+            background-color: #e68a00;
+        }
+        .clear-btn {
+            background-color: #f44336;
+        }
+        .clear-btn:hover {
+            background-color: #da190b;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+        .options {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>JSON to TSV Converter</h1>
+    <div class="container">
+        <div class="input-section">
+            <h2>Input JSON</h2>
+            <p>Paste your JSON data below or upload a JSON file</p>
+            <textarea id="jsonInput" placeholder="Paste your JSON data here..."></textarea>
+            <div class="buttons">
+                <input type="file" id="fileInput" accept=".json">
+                <button class="file-upload" onclick="document.getElementById('fileInput').click()">Upload JSON File</button>
+                <button onclick="loadSampleData()">Load Sample Data</button>
+                <button class="clear-btn" onclick="clearInput()">Clear</button>
+            </div>
+            <div id="inputMessage"></div>
+        </div>
+
+        <div class="options">
+            <h3>Options</h3>
+            <div class="checkbox-group">
+                <input type="checkbox" id="includeHeaders" checked>
+                <label for="includeHeaders">Include Headers</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="flattenObjects" checked>
+                <label for="flattenObjects">Flatten Nested Objects</label>
+            </div>
+        </div>
+
+        <button onclick="convertJsonToTsv()">Convert to TSV</button>
+
+        <div class="output-section">
+            <h2>Output TSV</h2>
+            <textarea id="tsvOutput" placeholder="TSV output will appear here..." readonly></textarea>
+            <div class="buttons">
+                <button class="download-btn" id="downloadBtn" onclick="downloadTsv()" disabled>Download TSV</button>
+                <button class="clear-btn" onclick="clearOutput()">Clear</button>
+            </div>
+            <div id="outputMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        // Event listener for file upload
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('jsonInput').value = e.target.result;
+                    document.getElementById('inputMessage').innerHTML = `<div class="success">File "${file.name}" loaded successfully!</div>`;
+                };
+                reader.onerror = function() {
+                    document.getElementById('inputMessage').innerHTML = `<div class="error">Error reading file!</div>`;
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Function to load sample data
+        function loadSampleData() {
+            const sampleData = [
+                {
+                    "Master Track Name": "Smooth Vibes",
+                    "Track Name": "Smooth Vibes (Main Version)",
+                    "Artist": "Hard N Low",
+                    "ISRC": "GB-4GW-23-10015",
+                    "ISWC": "T-319.771.247-9",
+                    "BPM": 88,
+                    "GENRE": "jazz/lounge/funk/soul/r&b"
+                },
+                {
+                    "Master Track Name": "A Busy Midnight",
+                    "Track Name": "A Busy Midnight (Main Version)",
+                    "Artist": "Hard N Low",
+                    "ISRC": "GB-4GW-23-10016",
+                    "ISWC": "T-319.771.249-1",
+                    "BPM": 120,
+                    "GENRE": "jazz/lounge/funk/soul/r&b"
+                }
+            ];
+            document.getElementById('jsonInput').value = JSON.stringify(sampleData, null, 2);
+            document.getElementById('inputMessage').innerHTML = '<div class="success">Sample data loaded!</div>';
+        }
+
+        // Function to clear input
+        function clearInput() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('inputMessage').innerHTML = '';
+        }
+
+        // Function to clear output
+        function clearOutput() {
+            document.getElementById('tsvOutput').value = '';
+            document.getElementById('outputMessage').innerHTML = '';
+            document.getElementById('downloadBtn').disabled = true;
+        }
+
+        // Function to flatten nested objects
+        function flattenObject(obj, prefix = '') {
+            return Object.keys(obj).reduce((acc, key) => {
+                const pre = prefix.length ? prefix + '.' : '';
+                if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+                    Object.assign(acc, flattenObject(obj[key], pre + key));
+                } else {
+                    acc[pre + key] = obj[key];
+                }
+                return acc;
+            }, {});
+        }
+
+        // Function to escape TSV values
+        function escapeTsvValue(value) {
+            if (value === null || value === undefined) {
+                return '';
+            }
+            
+            // Convert to string
+            const str = String(value);
+            
+            // If the value contains tabs, newlines, or double quotes, wrap it in quotes
+            if (str.includes('\t') || str.includes('\n') || str.includes('\r')) {
+                // Replace tabs with spaces to prevent breaking TSV format
+                return str.replace(/\t/g, ' ').replace(/\n/g, ' ').replace(/\r/g, ' ');
+            }
+            
+            return str;
+        }
+
+        // Function to convert JSON to TSV
+        function convertJsonToTsv() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+            const includeHeaders = document.getElementById('includeHeaders').checked;
+            const flattenObjects = document.getElementById('flattenObjects').checked;
+            const tsvOutput = document.getElementById('tsvOutput');
+            const outputMessage = document.getElementById('outputMessage');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            if (!jsonInput) {
+                outputMessage.innerHTML = '<div class="error">Please enter JSON data!</div>';
+                return;
+            }
+            
+            try {
+                // Parse JSON
+                let jsonData = JSON.parse(jsonInput);
+                
+                // Ensure jsonData is an array
+                if (!Array.isArray(jsonData)) {
+                    jsonData = [jsonData];
+                }
+                
+                if (jsonData.length === 0) {
+                    outputMessage.innerHTML = '<div class="error">JSON array is empty!</div>';
+                    return;
+                }
+                
+                // Flatten objects if option is selected
+                let processedData = jsonData;
+                if (flattenObjects) {
+                    processedData = jsonData.map(item => flattenObject(item));
+                }
+                
+                // Get all possible headers
+                const headers = new Set();
+                processedData.forEach(item => {
+                    Object.keys(item).forEach(key => headers.add(key));
+                });
+                const headerArray = Array.from(headers);
+                
+                // Create TSV content
+                let tsvContent = '';
+                
+                // Add headers if option is selected
+                if (includeHeaders) {
+                    tsvContent += headerArray.map(header => escapeTsvValue(header)).join('\t') + '\n';
+                }
+                
+                // Add data rows
+                processedData.forEach(item => {
+                    const row = headerArray.map(header => {
+                        const value = item[header] !== undefined ? item[header] : '';
+                        return escapeTsvValue(value);
+                    }).join('\t');
+                    tsvContent += row + '\n';
+                });
+                
+                // Display TSV
+                tsvOutput.value = tsvContent;
+                outputMessage.innerHTML = '<div class="success">Conversion successful!</div>';
+                downloadBtn.disabled = false;
+                
+            } catch (error) {
+                outputMessage.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                tsvOutput.value = '';
+                downloadBtn.disabled = true;
+            }
+        }
+
+        // Function to download TSV
+        function downloadTsv() {
+            const tsvContent = document.getElementById('tsvOutput').value;
+            if (!tsvContent) return;
+            
+            const blob = new Blob([tsvContent], { type: 'text/tab-separated-values;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'converted_data.tsv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

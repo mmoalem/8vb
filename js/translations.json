@@ -1,0 +1,415 @@
+{
+    "navHome": {
+      "en": "Home",
+      "fr": "Accueil",
+      "de": "Startseite",
+      "es": "Inicio",
+      "it": "Home"
+    },
+    "navSearch": {
+      "en": "Search Music",
+      "fr": "Rechercher de la Musique",
+      "de": "Musik suchen",
+      "es": "Buscar Música",
+      "it": "Cerca Musica"
+    },
+    "navMetadata": {
+      "en": "Search Metadata",
+      "fr": "Rechercher des Métadonnées",
+      "de": "Metadaten suchen",
+      "es": "Buscar Metadatos",
+      "it": "Cerca Metadati"
+    },
+    "navContact": {
+      "en": "Contact Us",
+      "fr": "Contactez-nous",
+      "de": "Kontaktieren Sie uns",
+      "es": "Contáctenos",
+      "it": "Contattaci"
+    },
+    "navLegal": {
+      "en": "Legal",
+      "fr": "Mentions Légales",
+      "de": "Rechtliches",
+      "es": "Legal",
+      "it": "Legale"
+    },
+    "langEN": {
+      "en": "EN",
+      "fr": "EN",
+      "de": "EN",
+      "es": "EN",
+      "it": "EN"
+    },
+    "langFR": {
+      "en": "FR",
+      "fr": "FR",
+      "de": "FR",
+      "es": "FR",
+      "it": "FR"
+    },
+    "contactPageTitle": {
+      "en": "Contact Us",
+      "fr": "Contactez-nous",
+      "de": "Kontaktieren Sie uns",
+      "es": "Contáctenos",
+      "it": "Contattaci"
+    },
+    "contactPagePara1": {
+      "en": "Have questions, feedback, or need help finding the right track? Fill out the form below, and we'll get back to you as soon as possible.",
+      "fr": "Vous avez des questions, des commentaires ou besoin d'aide pour trouver le bon morceau ? Remplissez le formulaire ci-dessous et nous vous répondrons dès que possible.",
+      "de": "Haben Sie Fragen, Feedback oder benötigen Sie Hilfe bei der Suche nach dem richtigen Track? Füllen Sie das untenstehende Formular aus, und wir werden uns so schnell wie möglich bei Ihnen melden.",
+      "es": "¿Tiene preguntas, comentarios o necesita ayuda para encontrar la pista adecuada? Rellene el siguiente formulario y nos pondremos en contacto con usted lo antes posible.",
+      "it": "Hai domande, feedback o hai bisogno di aiuto per trovare la traccia giusta? Compila il modulo sottostante e ti risponderemo il prima possibile."
+    },
+    "searchPlaceholder": {
+      "en": "Search by genre, instrument, keyword, mood",
+      "fr": "Rechercher par genre, instrument, mot-clé, humeur",
+      "de": "Suche nach Genre, Instrument, Stichwort, Stimmung",
+      "es": "Buscar por género, instrumento, palabra clave, estado de ánimo",
+      "it": "Cerca per genere, strumento, parola chiave, umore"
+    },
+    "showResultsLabel": {
+      "en": "Show results:",
+      "fr": "Afficher les résultats :",
+      "de": "Ergebnisse anzeigen:",
+      "es": "Mostrar resultados:",
+      "it": "Mostra risultati:"
+    },
+    "sortAlphabeticalAsc": {
+      "en": "Alphabetically (A-Z)",
+      "fr": "Alphabétiquement (A-Z)",
+      "de": "Alphabetisch (A-Z)",
+      "es": "Alfabéticamente (A-Z)",
+      "it": "In ordine alfabetico (A-Z)"
+    },
+    "sortAlphabeticalDesc": {
+      "en": "Alphabetically (Z-A)",
+      "fr": "Alphabétiquement (Z-A)",
+      "de": "Alphabetisch (Z-A)",
+      "es": "Alfabéticamente (Z-A)",
+      "it": "In ordine alfabetico (Z-A)"
+    },
+    "sortOldestFirst": {
+      "en": "Oldest First",
+      "fr": "Plus Anciens d'Abord",
+      "de": "Älteste zuerst",
+      "es": "Más antiguos primero",
+      "it": "Meno recenti prima"
+    },
+    "sortMostRecent": {
+      "en": "Most Recent",
+      "fr": "Plus Récents d'Abord",
+      "de": "Neueste zuerst",
+      "es": "Más recientes primero",
+      "it": "Più recenti prima"
+    },
+    "sortRandom": {
+      "en": "Random Order",
+      "fr": "Ordre Aléatoire",
+      "de": "Zufällige Reihenfolge",
+      "es": "Orden aleatorio",
+      "it": "Ordine casuale"
+    },
+    "footerCopyright": {
+      "en": "© 2024 8vb Music. All Rights Reserved.",
+      "fr": "© 2024 8vb Music. Tous droits réservés.",
+      "de": "© 2024 8vb Music. Alle Rechte vorbehalten.",
+      "es": "© 2024 8vb Music. Todos los derechos reservados.",
+      "it": "© 2024 8vb Music. Tutti i diritti riservati."
+    },
+    "footerTerms": {
+      "en": "Terms of Service",
+      "fr": "Conditions d'Utilisation",
+      "de": "Nutzungsbedingungen",
+      "es": "Términos de servicio",
+      "it": "Termini di servizio"
+    },
+    "footerPrivacy": {
+      "en": "Privacy Policy",
+      "fr": "Politique de Confidentialité",
+      "de": "Datenschutzrichtlinie",
+      "es": "Política de privacidad",
+      "it": "Informativa sulla privacy"
+    },
+    "footerCookies": {
+      "en": "Cookie Policy",
+      "fr": "Politique de Cookies",
+      "de": "Cookie-Richtlinie",
+      "es": "Política de cookies",
+      "it": "Politica sui cookie"
+    },
+    "cuesheetPageTitle": {
+      "en": "Cue Sheet Metadata",
+      "fr": "Métadonnées de Feuille de Traque",
+      "de": "Cue Sheet Metadaten",
+      "es": "Metadatos de la hoja de entrada",
+      "it": "Metadati Cue Sheet"
+    },
+    "cuesheetPagePara1": {
+      "en": "Find all the necessary metadata for cue sheet reporting below. You can scroll within the table to view all data.",
+      "fr": "Trouvez ci-dessous toutes les métadonnées nécessaires pour le rapport de feuille de traque. Vous pouvez faire défiler le tableau pour visualiser toutes les données.",
+      "de": "Unten finden Sie alle notwendigen Metadaten für die Cue-Sheet-Berichterstattung. Sie können innerhalb der Tabelle scrollen, um alle Daten anzuzeigen.",
+      "es": "Encuentre a continuación todos los metadatos necesarios para la presentación de informes de la hoja de entrada. Puede desplazarse dentro de la tabla para ver todos los datos.",
+      "it": "Trova di seguito tutti i metadati necessari per la reportistica del cue sheet. Puoi scorrere all'interno della tabella per visualizzare tutti i dati."
+    },
+    "legalPageTitle": {
+      "en": "Legal Information",
+      "fr": "Informations Légales",
+      "de": "Rechtliche Informationen",
+      "es": "Información legal",
+      "it": "Informazioni legali"
+    },
+    "legalPageIntroDate": {
+      "en": "Effective Date:",
+      "fr": "Date d'entrée en vigueur :",
+      "de": "Gültigkeitsdatum:",
+      "es": "Fecha de entrada en vigor:",
+      "it": "Data di entrata in vigore:"
+    },
+    "modalVersionHeader": {
+      "en": "Version",
+      "fr": "Version",
+      "de": "Version",
+      "es": "Versión",
+      "it": "Versione"
+    },
+    "modalLengthHeader": {
+      "en": "Length",
+      "fr": "Durée",
+      "de": "Länge",
+      "es": "Duración",
+      "it": "Durata"
+    },
+    "modalISRCHeader": {
+      "en": "ISRC",
+      "fr": "ISRC",
+      "de": "ISRC",
+      "es": "ISRC",
+      "it": "ISRC"
+    },
+    "modalISWCHeader": {
+      "en": "ISWC",
+      "fr": "ISWC",
+      "de": "ISWC",
+      "es": "ISWC",
+      "it": "ISWC"
+    },
+    "modalTunecodeHeader": {
+      "en": "Tunecode",
+      "fr": "Code Tunecode",
+      "de": "Tunecode",
+      "es": "Tunecode",
+      "it": "Tunecode"
+    },
+    "modalActionsHeader": {
+      "en": "Actions",
+      "fr": "Actions",
+      "de": "Aktionen",
+      "es": "Acciones",
+      "it": "Azioni"
+    },
+    "modalDownloadWav": {
+      "en": "Download WAV",
+      "fr": "Télécharger WAV",
+      "de": "WAV herunterladen",
+      "es": "Descargar WAV",
+      "it": "Scarica WAV"
+    },
+    "modalDownloadMp3": {
+      "en": "Download MP3",
+      "fr": "Télécharger MP3",
+      "de": "MP3 herunterladen",
+      "es": "Descargar MP3",
+      "it": "Scarica MP3"
+    },
+    "indexLoadingAlbums": {
+      "en": "Loading albums...",
+      "fr": "Chargement des albums…",
+      "de": "Alben werden geladen...",
+      "es": "Cargando álbumes...",
+      "it": "Caricamento album..."
+    },
+    "indexNoAlbumsFound": {
+      "en": "No albums found in library data.",
+      "fr": "Aucun album trouvé dans les données de la bibliothèque.",
+      "de": "Keine Alben in den Bibliotheksdaten gefunden.",
+      "es": "No se encontraron álbumes en los datos de la biblioteca.",
+      "it": "Nessun album trovato nei dati della libreria."
+    },
+    "dataLoadError": {
+      "en": "Error loading music data. Please check console or try again later.",
+      "fr": "Erreur lors du chargement des données musicales. Veuillez vérifier la console ou réessayer plus tard.",
+      "de": "Fehler beim Laden der Musikdaten. Bitte überprüfen Sie die Konsole oder versuchen Sie es später erneut.",
+      "es": "Error al cargar los datos de música. Por favor, compruebe la consola o inténtelo de nuevo más tarde.",
+      "it": "Errore durante il caricamento dei dati musicali. Controlla la console o riprova più tardi."
+    },
+    "loadingMusicData": {
+      "en": "Loading music data...",
+      "fr": "Chargement des données musicales...",
+      "de": "Musikdaten werden geladen...",
+      "es": "Cargando datos de música...",
+      "it": "Caricamento dati musicali..."
+    },
+    "noResultsFound": {
+      "en": "No results found matching",
+      "fr": "Aucun résultat trouvé correspondant à",
+      "de": "Keine Ergebnisse gefunden für",
+      "es": "No se encontraron resultados que coincidan con",
+      "it": "Nessun risultato trovato corrispondente a"
+    },
+    "noTracksToDisplay": {
+      "en": "No tracks to display. Loading or empty dataset.",
+      "fr": "Aucun morceau à afficher. Données en cours de chargement ou ensemble de données vide.",
+      "de": "Keine Tracks zum Anzeigen. Laden oder leeres Dataset.",
+      "es": "No hay pistas para mostrar. Cargando o conjunto de datos vacío.",
+      "it": "Nessuna traccia da visualizzare. Caricamento o set di dati vuoto."
+    },
+    "albumLabel": {
+      "en": "Album:",
+      "fr": "Album :",
+      "de": "Album:",
+      "es": "Álbum:",
+      "it": "Album:"
+    },
+    "artistLabel": {
+      "en": "Composer/Artist:",
+      "fr": "Compositeur/Artiste :",
+      "de": "Komponist/Künstler:",
+      "es": "Compositor/Artista:",
+      "it": "Compositore/Artista:"
+    },
+    "isrcLabel": {
+      "en": "ISRC:",
+      "fr": "ISRC :",
+      "de": "ISRC:",
+      "es": "ISRC:",
+      "it": "ISRC:"
+    },
+    "prsTunecodeLabel": {
+      "en": "PRS Tunecode:",
+      "fr": "Code Tunecode PRS :",
+      "de": "PRS Tunecode:",
+      "es": "PRS Tunecode:",
+      "it": "PRS Tunecode:"
+    },
+    "iswcLabel": {
+      "en": "ISWC:",
+      "fr": "ISWC :",
+      "de": "ISWC:",
+      "es": "ISWC:",
+      "it": "ISWC:"
+    },
+    "genreLabel": {
+      "en": "Genre:",
+      "fr": "Genre :",
+      "de": "Genre:",
+      "es": "Género:",
+      "it": "Genere:"
+    },
+    "moodLabel": {
+      "en": "Mood:",
+      "fr": "Humeur :",
+      "de": "Stimmung:",
+      "es": "Estado de ánimo:",
+      "it": "Umore:"
+    },
+    "keywordsLabel": {
+      "en": "Keywords:",
+      "fr": "Mots-clés :",
+      "de": "Schlüsselwörter:",
+      "es": "Palabras clave:",
+      "it": "Parole chiave:"
+    },
+    "showVersionsButton": {
+      "en": "All Versions",
+      "fr": "Toutes les versions",
+      "de": "Alle Versionen",
+      "es": "Todas las versiones",
+      "it": "Tutte le versioni"
+    },
+    "paginationPrevious": {
+      "en": "Previous",
+      "fr": "Précédent",
+      "de": "Zurück",
+      "es": "Anterior",
+      "it": "Precedente"
+    },
+    "paginationNext": {
+      "en": "Next",
+      "fr": "Suivant",
+      "de": "Weiter",
+      "es": "Siguiente",
+      "it": "Successivo"
+    },
+    "modalAllVersionsLabel": {
+      "en": "All versions of",
+      "fr": "Toutes les versions de",
+      "de": "Alle Versionen von",
+      "es": "Todas las versiones de",
+      "it": "Tutte le versioni di"
+    },
+    "noVersionsFound": {
+      "en": "No alternative versions found for this track.",
+      "fr": "Aucune version alternative trouvée pour ce morceau.",
+      "de": "Keine alternativen Versionen für diesen Track gefunden.",
+      "es": "No se encontraron versiones alternativas para esta pista.",
+      "it": "Nessuna versione alternativa trovata per questa traccia."
+    },
+    "indexWelcomeHeading": {
+      "en": "Welcome to 8vb Music production music library",
+      "fr": "Bienvenue dans la bibliothèque musicale de production 8vb Music",
+      "de": "Willkommen in der 8vb Music Produktionsmusikbibliothek",
+      "es": "Bienvenido a la biblioteca de música de producción 8vb Music",
+      "it": "Benvenuti nella libreria musicale di produzione 8vb Music"
+    },
+    "indexWelcomePara1": {
+      "en": "Founded by musicians and video editors, our catalogue aims to address the requirements we encountered working in TV and Film post-production. However, our versatile music fits perfectly into any media project – games, podcasts, online content, and more. Our goal is to build a dynamic catalogue of distinctive music cues that are still easy to place into any edit timeline.",
+      "fr": "Fondé par des musiciens et des monteurs vidéo, notre catalogue vise à répondre aux exigences que nous avons rencontrées en travaillant en post-production TV et Film. Cependant, notre musique polyvalente s'adapte parfaitement à tout projet média - jeux, podcasts, contenu en ligne, et plus encore. Notre objectif est de construire un catalogue dynamique de morceaux musicaux distinctifs, tout en restant faciles à placer dans n'importe quelle ligne de montage.",
+      "de": "Gegründet von Musikern und Videoeditoren, zielt unser Katalog darauf ab, die Anforderungen zu erfüllen, denen wir bei der Arbeit in der Postproduktion von TV und Film begegnet sind. Unsere vielseitige Musik passt jedoch perfekt in jedes Medienprojekt – Spiele, Podcasts, Online-Inhalte und mehr. Unser Ziel ist es, einen dynamischen Katalog von unverwechselbaren Musiktiteln aufzubauen, die sich dennoch leicht in jede Bearbeitungszeitleiste einfügen lassen.",
+      "es": "Fundado por músicos y editores de video, nuestro catálogo tiene como objetivo abordar los requisitos que encontramos trabajando en la postproducción de TV y cine. Sin embargo, nuestra música versátil encaja perfectamente en cualquier proyecto de medios: juegos, podcasts, contenido en línea y más. Nuestro objetivo es construir un catálogo dinámico de pistas musicales distintivas que sigan siendo fáciles de colocar en cualquier línea de tiempo de edición.",
+      "it": "Fondata da musicisti e montatori video, il nostro catalogo mira a soddisfare le esigenze che abbiamo riscontrato lavorando nella post-produzione televisiva e cinematografica. Tuttavia, la nostra musica versatile si adatta perfettamente a qualsiasi progetto multimediale: giochi, podcast, contenuti online e altro ancora. Il nostro obiettivo è costruire un catalogo dinamico di spunti musicali distintivi che siano comunque facili da inserire in qualsiasi timeline di montaggio."
+    },
+    "indexWelcomePara2": {
+      "en": "8vb Music is registered with <b>PRS/MCPS</b> and operate under the standard <b>PRS/MCPS</b> licensing, ensuring a straightforward clearance process for professional use worldwide, giving you peace of mind.",
+      "fr": "8vb Music est enregistré auprès de la <b>PRS/MCPS</b> et opère sous les licences standard <b>PRS/MCPS</b>, garantissant un processus d'autorisation simple pour une utilisation professionnelle dans le monde entier, vous offrant ainsi la tranquillité d'esprit.",
+      "de": "8vb Music ist bei <b>PRS/MCPS</b> registriert und operiert unter der Standard-<b>PRS/MCPS</b>-Lizenzierung, was einen unkomplizierten Freigabeprozess für den professionellen Einsatz weltweit gewährleistet und Ihnen Sicherheit gibt.",
+      "es": "8vb Music está registrada en <b>PRS/MCPS</b> y opera bajo la licencia estándar de <b>PRS/MCPS</b>, lo que garantiza un proceso de autorización sencillo para uso profesional en todo el mundo, brindándole tranquilidad.",
+      "it": "8vb Music è registrata presso <b>PRS/MCPS</b> e opera secondo le licenze standard <b>PRS/MCPS</b>, garantendo un processo di autorizzazione semplice per l'uso professionale in tutto il mondo, offrendoti tranquillità."
+    },
+    "indexWelcomePara3": {
+      "en": "Explore our collection: You can search, audition, and download high-quality production music directly from our catalogue. Click any album cover on this page to browse its tracks, or <a href=\"search.html\">search</a> our entire collection by keywords, genre, mood, instrumentation, and more.",
+      "fr": "Explorez notre collection : Vous pouvez rechercher, auditionner et télécharger des fichiers audio de musique de production de haute qualité directement depuis notre catalogue. Cliquez sur n'importe quelle pochette d'album sur cette page pour parcourir ses morceaux, ou <a href=\"./search.html\">recherchez</a> notre collection complète par mots-clés, genre, humeur, instrumentation, et plus encore.",
+      "de": "Entdecken Sie unsere Sammlung: Sie können hochwertige Produktionsmusik direkt aus unserem Katalog suchen, anhören und herunterladen. Klicken Sie auf ein beliebiges Albumcover auf dieser Seite, um dessen Tracks zu durchsuchen, oder <a href=\"search.html\">durchsuchen</a> Sie unsere gesamte Sammlung nach Stichwörtern, Genre, Stimmung, Instrumentierung und mehr.",
+      "es": "Explore nuestra colección: puede buscar, escuchar y descargar música de producción de alta calidad directamente desde nuestro catálogo. Haga clic en la portada de cualquier álbum en esta página para explorar sus pistas, o <a href=\"search.html\">busque</a> en toda nuestra colección por palabras clave, género, estado de ánimo, instrumentación y más.",
+      "it": "Esplora la nostra collezione: puoi cercare, ascoltare e scaricare musica di produzione di alta qualità direttamente dal nostro catalogo. Fai clic sulla copertina di qualsiasi album in questa pagina per sfogliare le sue tracce, oppure <a href=\"search.html\">cerca</a> nella nostra intera collezione per parole chiave, genere, umore, strumentazione e altro ancora."
+    },
+    "indexWelcomePara4": {
+      "en": "Stems, cut-downs, and alternative mixes are available for most tracks. If you need these specific versions, please don't hesitate to <a href=\"contact.html\">contact us</a> with your requirements.",
+      "fr": "Les pistes séparées (stems), les versions raccourcies (cut-downs) et les mixages alternatifs sont disponibles pour la plupart des morceaux. Si vous avez besoin de ces versions spécifiques, n'hésitez pas à <a href=\"./contact.html\">nous contacter</a> avec vos besoins.",
+      "de": "Stems, Cut-Downs und alternative Mixe sind für die meisten Tracks verfügbar. Wenn Sie diese spezifischen Versionen benötigen, zögern Sie bitte nicht, uns <a href=\"contact.html\">zu kontaktieren</a> mit Ihren Anforderungen.",
+      "es": "Hay disponibles stems, versiones reducidas y mezclas alternativas para la mayoría de las pistas. Si necesita estas versiones específicas, no dude en <a href=\"contact.html\">contactarnos</a> con sus requisitos.",
+      "it": "Stem, versioni ridotte e mix alternativi sono disponibili per la maggior parte delle tracce. Se hai bisogno di queste versioni specifiche, non esitare a <a href=\"contact.html\">contattarci</a> con le tue esigenze."
+    },
+    "audioUnavailableError": {
+      "en": "Audio unavailable",
+      "fr": "Audio non disponible",
+      "de": "Audio nicht verfügbar",
+      "es": "Audio no disponible",
+      "it": "Audio non disponibile"
+    },
+    "modalDurationHeader": {
+      "en": "Duration",
+      "fr": "Durée",
+      "de": "Dauer",
+      "es": "Duración",
+      "it": "Durata"
+    },
+    "modalPlay": {
+      "en": "Play",
+      "fr": "Lire",
+      "de": "Abspielen",
+      "es": "Reproducir",
+      "it": "Riproduci"
+    }
+  }

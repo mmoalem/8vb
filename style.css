@@ -134,99 +134,260 @@ body {
         .page-link.disabled { color: #aaa; background-color: #f8f8f8; border-color: #ddd; cursor: not-allowed; }
         .page-ellipsis { border: none; background: none; cursor: default; padding: 8px 5px; }
 
-		/* --- Styles for Modal (Used in Search.html) --- */
-		.modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
 
-        .modal-content {
-            background-color: #e6c97d; /* You changed this bg color */
-            margin: auto;
-            padding: 0;
-            border: 1px solid #888;
-            display: flex;
-            flex-direction: column;
-            width: 80%; /* Set width */
-            max-width: none; /* Removed max-width constraint */
-            max-height: 85vh;
-            height: auto;
-            overflow: hidden;
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            box-sizing: border-box; /* Added box-sizing */
-        }
 
-        .modal-header-info {
-            padding: 20px 25px 15px 25px;
-            border-bottom: 1px solid #eee;
-            flex-shrink: 0;
-        }
-        .modal-header-info h2 { margin-top: 0; margin-bottom: 5px; font-size: 24px; color: #333; }
-        .modal-header-info .artist { margin-bottom: 0; font-size: 14px; color: #557; line-height: 1.4; }
+/* --- Styles for Modal (Used in Search.html) --- */
+.modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
 
-        .modal-layout {
-            display: flex;
-            width: 100%;
-            flex-grow: 1;
-            min-height: 0;
-            align-items: flex-start;
-            padding: 20px 0;
-            box-sizing: border-box;
-        }
+.modal-content {
+    background-color: #fcfaeb; /* Match site background color */
+    margin: auto;
+    padding: 0;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    max-width: 1500px; /* Increased max-width */
+    max-height: 85vh;
+    height: auto;
+    overflow: hidden;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-sizing: border-box;
+}
 
-        .album-cover {
-            flex: 0 0 500px;
-            width: 500px;
-            height: 500px;
-            overflow: hidden;
-            padding: 10px;
-            box-sizing: border-box;
-            margin-left: 25px;
-            margin-right: 15px;
-        }
-        .album-cover img {
-             width: 100%;
-             height: 100%;
-            object-fit: cover;
-            display: block;
-            border-radius: 4px;
-        }
+.modal-header-info {
+    padding: 20px 25px 15px 25px;
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0;
+    background-color: #fcfaeb;
+    position: relative; /* Needed for absolute positioning of close button */
+}
+.modal-header-info h2 { margin-top: 0; margin-bottom: 5px; font-size: 24px; color: #333; }
+.modal-header-info .artist { margin-bottom: 0; font-size: 14px; color: #557; line-height: 1.4; }
 
-        .modal-info {
-            flex: 1;
-            padding: 0px 25px 0px 10px;
-            overflow-y: auto;
-            align-self: stretch;
-            max-height: calc(85vh - 100px); /* Adjust base value if needed */
-        }
-        #modalVersions { width: 100%; }
-        .version-row { display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 15px; padding: 8px; background-color: #f9f9f9; border-radius: 5px; border: 1px solid #eee; }
-        .version-row .track-name { flex: 1 1 150px; margin-right: 15px; margin-left: 10px; font-size: 15px; font-weight: bold; margin-bottom: 5px; }
-        .version-row audio { width: 100%; max-width: 300px; height: 40px; margin-right: 15px; margin-bottom: 5px; }
-        .version-row .download-buttons { margin-left: auto; margin-bottom: 5px; }
+.modal-layout {
+    display: flex;
+    width: 100%;
+    flex-grow: 1;
+    min-height: 0;
+    align-items: flex-start;
+    padding: 20px 0;
+    box-sizing: border-box;
+    background-color: #fcfaeb;
+}
 
-        .close { position: absolute; top: 10px; right: 15px; color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; z-index: 101; transition: color 0.2s ease;}
-        .close:hover, .close:focus { color: #333; text-decoration: none; }
+.album-cover {
+    flex: 0 0 500px; /* Adjusted size */
+    width: 500px;
+    height: 500px;
+    overflow: hidden;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-left: 25px;
+    margin-right: 15px;
+}
+.album-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 4px;
+}
 
-        /* --- Modal Responsiveness --- */
-        @media (max-height: 650px) {
-             .album-cover { flex-basis: 400px; width: 400px; height: 400px; }
-             .modal-content { max-height: 90vh; }
-        }
-        @media (max-width: 1100px) {
-            .album-cover { flex-basis: 400px; width: 400px; height: 400px; }
-        }
-        @media (max-width: 900px) {
-             .modal-content { width: 90%; }
-             .album-cover { flex-basis: 300px; width: 300px; height: 300px; }
-        }
-        @media (max-width: 768px) {
-            .modal-content { width: 95%; max-height: 90vh; }
-            .modal-layout { flex-direction: column; align-items: center; padding: 15px 0; }
-            .album-cover { flex-basis: auto; width: 80%; max-width: 300px; height: auto; margin: 0 auto 15px auto; padding: 5px; border-right: none; }
-            .album-cover img { object-fit: contain; }
-            .modal-info { width: 90%; max-height: 50vh; align-self: center; padding: 0 10px; }
-            .modal-header-info h2 { font-size: 20px; }
-            .version-row audio { max-width: 250px; }
-        }
-		/* --- End Styles for Modal --- */
+.modal-info {
+    flex: 1;
+    padding: 0px 25px 0px 10px;
+    overflow-y: auto;
+    align-self: stretch; /* Make it take full height */
+    max-height: calc(85vh - 120px); /* Adjust max-height based on header/padding */
+}
+
+/* --- Version Row Styling (Using DIVs and Flexbox) --- */
+.version-row {
+    display: flex;
+    flex-wrap: nowrap; /* Keep items on one line on desktop */
+    justify-content: space-between; /* Pushes name left and actions right */
+    align-items: center; /* Vertically center items */
+    margin-bottom: 15px;
+    padding: 12px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border: 1px solid #eee;
+    gap: 15px; /* Add gap between name and actions */
+}
+
+.version-row .version-name {
+    /* flex: 0 0 auto; */ /* Let it take natural width */
+    font-size: 15px;
+    font-weight: bold;
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px; /* Adjust max-width as needed */
+    margin-right: auto; /* Helps push actions to the right */
+}
+
+.version-row .version-actions {
+    display: flex;
+    align-items: center; /* Align audio and buttons */
+    flex-shrink: 0; /* Prevent this container from shrinking */
+    gap: 15px; /* Gap between audio and download buttons */
+}
+
+.version-row audio {
+    /* flex: 1 1 auto; */ /* Remove flex grow/shrink */
+    max-width: 350px; /* Adjust max-width */
+    min-width: 250px; /* Adjust min-width */
+    height: 40px;
+    /* margin-right: 15px; */ /* Use gap in parent instead */
+    /* margin-bottom: 0; */ /* Remove bottom margin */
+}
+
+.version-row .download-buttons {
+    display: flex; /* Already flex */
+    gap: 10px; /* Keep gap */
+    align-items: center; /* Keep alignment */
+    /* margin-left: auto; */ /* Remove margin-left: auto */
+    /* margin-bottom: 0; */ /* Remove bottom margin */
+    white-space: nowrap;
+}
+
+/* Keep download button image styles */
+.download-button { display: inline-block; padding: 5px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; text-decoration: none; line-height: 0; }
+.download-button:hover { background-color: #e0e0e0; }
+.download-button img { width: 30px; height: 30px; vertical-align: middle; }
+
+/* Hide version IDs that shouldn't be displayed */
+.version-id, .version-row .version-id {
+    display: none !important;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 101;
+    transition: color 0.2s ease;
+    background: none; /* Ensure no background */
+    border: none; /* Ensure no border */
+    padding: 0; /* Ensure no padding */
+}
+.close:hover, .close:focus {
+    color: #333;
+    text-decoration: none;
+}
+
+
+/* --- Modal Responsiveness --- */
+@media (max-height: 650px) {
+    .album-cover {
+        flex-basis: 180px;
+        width: 180px;
+        height: 180px;
+    }
+    .modal-content {
+        max-height: 90vh;
+    }
+    .modal-info {
+         max-height: calc(90vh - 120px); /* Adjust based on new max-height */
+    }
+}
+@media (max-width: 1100px) {
+    .album-cover {
+        flex-basis: 180px;
+        width: 180px;
+        height: 180px;
+    }
+}
+@media (max-width: 900px) {
+    .modal-content {
+        width: 95%;
+    }
+    .album-cover {
+        flex-basis: 160px;
+        width: 160px;
+        height: 160px;
+    }
+}
+
+/* --- Mobile Modal Layout --- */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+    .modal-layout {
+        flex-direction: column;
+        align-items: center;
+        padding: 15px 0;
+    }
+    .album-cover {
+        flex-basis: auto;
+        width: 80%;
+        max-width: 200px;
+        height: auto;
+        margin: 0 auto 15px auto;
+        padding: 5px;
+        /* border-right: none; */ /* Removed as it's not relevant now */
+    }
+    .album-cover img {
+        object-fit: contain;
+    }
+    .modal-info {
+        width: 90%;
+        max-height: 50vh; /* Adjust if needed */
+        align-self: center;
+        padding: 0 10px;
+    }
+    .modal-header-info h2 {
+        font-size: 20px;
+    }
+
+    /* --- Version Row Mobile --- */
+    .version-row {
+        flex-wrap: wrap; /* Allow wrapping */
+        justify-content: center; /* Center items when wrapped */
+        gap: 10px; /* Reduce gap */
+    }
+    .version-row .version-name {
+        flex: 1 1 100%; /* Take full width */
+        text-align: center; /* Center name */
+        margin-bottom: 5px;
+        margin-right: 0; /* Reset margin */
+        max-width: none; /* Remove max-width */
+    }
+    .version-row .version-actions {
+        flex: 1 1 100%; /* Take full width */
+        justify-content: center; /* Center audio and buttons */
+        flex-wrap: wrap; /* Allow audio/buttons to wrap if needed */
+        gap: 10px; /* Reduce gap */
+    }
+    .version-row audio {
+        max-width: 100%; /* Full width */
+        min-width: 400px; /* Adjust min-width */
+        /* margin-right: 0; */ /* Handled by gap */
+        /* margin-bottom: 10px; */ /* Handled by gap */
+    }
+    .version-row .download-buttons {
+        /* width: 100%; */ /* Not needed with flex */
+        /* display: flex; */ /* Already flex */
+        justify-content: center;
+        /* margin-left: 0; */ /* Handled by gap/parent */
+    }
+}
+/* --- End Styles for Modal --- */
+
+
+
 
 
         /* --- RESPONSIVENESS --- */
@@ -480,4 +641,197 @@ body {
 /* Prevent scrolling on body when mobile menu is open (optional) */
 body.mobile-menu-active {
     overflow: hidden;
+}
+
+/* Add this block to your existing style.css */
+
+/* --- Language Selector Styling (Dropdown and Flags) --- */
+
+/* Container LI within the menu UL */
+.language-menu-item {
+    position: relative; /* Needed for the absolute positioning of the dropdown */
+    display: flex; /* Use flex to align span and dropdown */
+    align-items: center;
+    margin-left: 30px; /* Add some space from the previous menu item */
+    padding: 0; /* Reset padding */
+    cursor: pointer; /* Indicate it's clickable */
+    z-index: 26; /* Ensure it's clickable above other elements */
+}
+
+/* The currently selected language text/flag */
+.language-menu-item .current-language {
+    display: flex; /* Align flag and text */
+    align-items: center;
+    padding: 5px 0; /* Match menu item padding */
+    font-size: 17px; /* Match menu item font size */
+    font-weight: normal; /* Default weight */
+    color: #000;
+    transition: color 0.3s ease;
+    /* Optional: Add an indicator like a small arrow */
+    /* content: ' ▼'; display: inline-block; margin-left: 5px; font-size: 12px; */
+}
+
+.language-menu-item .current-language:hover {
+    color: #333;
+}
+
+/* Flag icon styling */
+.language-menu-item .flag-icon {
+    width: 20px; /* Adjust size as needed */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 5px; /* Space between flag and text */
+    vertical-align: middle;
+    border: 1px solid #ccc; /* Optional: subtle border */
+    box-shadow: 0 0 2px rgba(0,0,0,0.1); /* Optional: subtle shadow */
+}
+
+/* The dropdown UL */
+.language-dropdown {
+    display: none !important; /* Hidden by default */
+    position: absolute;
+    top: 100%; /* Position directly below the .current-language span */
+    right: 0; /* Align right edge with the parent LI */
+    background-color: #fcf0d8; /* Menu background or similar */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    list-style: none;
+    padding: 5px 0; /* Padding inside the dropdown */
+    margin: 0;
+    border-radius: 4px;
+    min-width: 100px; /* Ensure enough width for language names */
+    z-index: 100; /* Above everything else */
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Dropdown list items */
+.language-dropdown li {
+    margin: 0; /* Remove default list item margin */
+    padding: 0;
+}
+
+/* Dropdown links */
+.language-dropdown li a {
+    display: flex; /* Align flag and text in dropdown items */
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    padding: 8px 15px; /* Padding for touch targets */
+    font-size: 16px; /* Slightly smaller than main menu */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.language-dropdown li a:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #000;
+}
+
+/* Flag icons inside the dropdown */
+.language-dropdown li a img.flag-icon {
+     width: 18px; /* Slightly smaller flags in dropdown */
+     height: auto;
+     margin-right: 8px;
+     border: 1px solid #ddd; /* Subtle border for dropdown flags */
+     box-shadow: none; /* Remove shadow from dropdown flags */
+}
+
+/* Style for the active language link in the dropdown (optional) */
+.language-dropdown li a.active {
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Show the dropdown when the menu item is hovered or has the 'open' class (toggled by JS) */
+.language-menu-item:hover .language-dropdown,
+.language-menu-item.open .language-dropdown {
+    display: block;
+}
+
+/* Hide mobile language items by default (shown in mobile menu) */
+.mobile-lang-item {
+    display: none;
+}
+
+
+/* --- RESPONSIVENESS --- */
+
+/* At the breakpoint where the hamburger menu appears */
+@media (max-width: 768px) {
+    /* Hide desktop language dropdown menu item */
+    #menu-panel nav ul .language-menu-item {
+        display: none;
+    }
+
+    /* Show mobile language items in the mobile menu */
+    #mobile-menu nav ul .mobile-lang-item {
+         display: block; /* Or list-item */
+         margin-bottom: 5px; /* Add space between mobile language links */
+         padding: 0; /* Reset padding */
+    }
+
+    /* Style mobile language links */
+     #mobile-menu nav ul .mobile-lang-item a {
+        display: flex; /* Align flag and text */
+        align-items: center;
+        padding: 12px 15px; /* Match other mobile menu items */
+        font-size: 18px; /* Match other mobile menu items */
+        color: #333;
+        text-decoration: none;
+        border-radius: 4px;
+     }
+
+     #mobile-menu nav ul .mobile-lang-item a:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+     }
+
+     /* Style mobile language flags */
+     #mobile-menu nav ul .mobile-lang-item a img.flag-icon {
+         width: 20px; /* Match desktop flag size or adjust */
+         height: auto;
+         margin-right: 8px;
+         border: none; /* Remove border in mobile menu */
+         box-shadow: none;
+     }
+
+     /* Style active mobile language link */
+      #mobile-menu nav ul .mobile-lang-item a.active {
+          font-weight: bold;
+          background-color: rgba(0, 0, 0, 0.1);
+     }
+}
+
+/* --- CSS FIXES FOR LANGUAGE DROPDOWN --- */
+/* Add these styles to your style.css file */
+
+/* Ensure dropdown is visible when parent has open class */
+.language-menu-item.open .language-dropdown {
+    display: block !important;
+}
+
+/* Make the current language span clearly clickable */
+.language-menu-item .current-language {
+    cursor: pointer;
+    padding: 5px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.language-menu-item .current-language:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+/* Position the dropdown better */
+.language-dropdown { /* This rule block exists later in the fixes */
+    top: calc(100% + 5px); /* This overrides the earlier top: 100% */
+    min-width: 80px; /* This overrides the earlier min-width: 100px */
+    border: 1px solid #ddd; /* This overrides the earlier border */
+    background-color: #fcfaeb; /* This overrides the earlier background-color */
+    /* Importantly, this block does NOT set display */
+}
+
+/* Add a small down arrow indicator */
+.language-menu-item .current-language::after {
+    content: '▼';
+    display: inline-block;
+    font-size: 10px;
+    margin-left: 5px;
+    vertical-align: middle;
 }

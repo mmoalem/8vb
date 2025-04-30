@@ -1,0 +1,230 @@
+// --- js/translations.json ---
+{
+  "navHome": {
+    "en": "Home",
+    "fr": "Accueil"
+  },
+  "navSearch": {
+    "en": "Search Music",
+    "fr": "Rechercher de la Musique"
+  },
+   "navMetadata": {
+    "en": "Search Metadata",
+    "fr": "Rechercher des Métadonnées"
+  },
+   "navContact": {
+    "en": "Contact Us",
+    "fr": "Contactez-nous"
+  },
+   "navLegal": {
+    "en": "Legal",
+    "fr": "Mentions Légales"
+  },
+  "langEN": {
+    "en": "EN",
+    "fr": "EN"
+  },
+  "langFR": {
+    "en": "FR",
+    "fr": "FR"
+  },
+  "contactPageTitle": {
+      "en": "Contact Us",
+      "fr": "Contactez-nous"
+  },
+  "contactPagePara1": {
+      "en": "Have questions, feedback, or need help finding the right track? Fill out the form below, and we'll get back to you as soon as possible.",
+      "fr": "Vous avez des questions, des commentaires ou besoin d'aide pour trouver le bon morceau ? Remplissez le formulaire ci-dessous et nous vous répondrons dès que possible."
+  },
+   "searchPlaceholder": {
+      "en": "Search by genre, instrument, keyword, mood",
+      "fr": "Rechercher par genre, instrument, mot-clé, humeur"
+  },
+  "showResultsLabel": {
+      "en": "Show results:",
+      "fr": "Afficher les résultats :"
+  },
+   "sortAlphabeticalAsc": {
+        "en": "Alphabetically (A-Z)",
+        "fr": "Alphabétiquement (A-Z)"
+    },
+    "sortAlphabeticalDesc": {
+        "en": "Alphabetically (Z-A)",
+        "fr": "Alphabétiquement (Z-A)"
+    },
+    "sortOldestFirst": {
+         "en": "Oldest First",
+         "fr": "Plus Anciens d'Abord"
+    },
+    "sortMostRecent": {
+        "en": "Most Recent",
+        "fr": "Plus Récents d'Abord"
+    },
+    "sortRandom": {
+        "en": "Random Order",
+        "fr": "Ordre Aléatoire"
+    },
+    "footerCopyright": {
+        "en": "© 2024 8vb Music. All Rights Reserved.",
+        "fr": "© 2024 8vb Music. Tous droits réservés."
+    },
+    "footerTerms": {
+        "en": "Terms of Service",
+        "fr": "Conditions d'Utilisation"
+    },
+    "footerPrivacy": {
+         "en": "Privacy Policy",
+         "fr": "Politique de Confidentialité"
+    },
+    "footerCookies": {
+         "en": "Cookie Policy",
+         "fr": "Politique de Cookies"
+    },
+     "cuesheetPageTitle": {
+         "en": "Cue Sheet Metadata",
+         "fr": "Métadonnées de Feuille de Traque"
+     },
+      "cuesheetPagePara1": {
+          "en": "Find all the necessary metadata for cue sheet reporting below. You can scroll within the table to view all data.",
+          "fr": "Trouvez ci-dessous toutes les métadonnées nécessaires pour le rapport de feuille de traque. Vous pouvez faire défiler le tableau pour visualiser toutes les données."
+     },
+      "legalPageTitle": {
+          "en": "Legal Information",
+          "fr": "Informations Légales"
+      },
+      "legalPageIntroDate": {
+          "en": "Effective Date:",
+          "fr": "Date d'entrée en vigueur :"
+      },
+       "modalVersionHeader": {
+           "en": "Version",
+           "fr": "Version"
+       },
+        "modalLengthHeader": {
+            "en": "Length",
+            "fr": "Durée"
+        },
+       "modalISRCHeader": {
+           "en": "ISRC",
+           "fr": "ISRC"
+       },
+       "modalISWCHeader": {
+           "en": "ISWC",
+           "fr": "ISWC"
+       },
+       "modalTunecodeHeader": {
+           "en": "Tunecode",
+           "fr": "Code Tunecode"
+       },
+        "modalActionsHeader": {
+            "en": "Actions",
+            "fr": "Actions"
+        },
+         "modalDownloadWav": {
+             "en": "Download WAV",
+             "fr": "Télécharger WAV"
+        },
+         "modalDownloadMp3": {
+             "en": "Download MP3",
+             "fr": "Télécharger MP3"
+        },
+        "indexLoadingAlbums": {
+             "en": "Loading albums...",
+             "fr": "Chargement des albums…"
+        },
+         "indexNoAlbumsFound": {
+             "en": "No albums found in library data.",
+             "fr": "Aucun album trouvé dans les données de la bibliothèque."
+         },
+         "dataLoadError": {
+             "en": "Error loading music data. Please check console or try again later.",
+             "fr": "Erreur lors du chargement des données musicales. Veuillez vérifier la console ou réessayer plus tard."
+         },
+         "loadingMusicData": {
+             "en": "Loading music data...",
+             "fr": "Chargement des données musicales..."
+         },
+         "noResultsFound": {
+             "en": "No results found matching",
+             "fr": "Aucun résultat trouvé correspondant à"
+         },
+         "noTracksToDisplay": {
+              "en": "No tracks to display. Loading or empty dataset.",
+              "fr": "Aucun morceau à afficher. Données en cours de chargement ou ensemble de données vide."
+         },
+          "albumLabel": {
+            "en": "Album:",
+            "fr": "Album :"
+          },
+          "artistLabel": {
+            "en": "Composer/Artist:",
+            "fr": "Compositeur/Artiste :"
+          },
+          "isrcLabel": {
+            "en": "ISRC:",
+            "fr": "ISRC :"
+          },
+          "prsTunecodeLabel": {
+            "en": "PRS Tunecode:",
+            "fr": "Code Tunecode PRS :"
+          },
+           "iswcLabel": {
+            "en": "ISWC:",
+            "fr": "ISWC :"
+          },
+           "genreLabel": {
+            "en": "Genre:",
+            "fr": "Genre :"
+          },
+           "moodLabel": {
+            "en": "Mood:",
+            "fr": "Humeur :"
+          },
+           "keywordsLabel": {
+            "en": "Keywords:",
+            "fr": "Mots-clés :"
+          },
+           "showVersionsButton": {
+             "en": "All Versions",
+             "fr": "Toutes les versions"
+           },
+           "paginationPrevious": {
+              "en": "Previous",
+              "fr": "Précédent"
+           },
+           "paginationNext": {
+              "en": "Next",
+              "fr": "Suivant"
+           },
+           "modalAllVersionsLabel": {
+               "en": "All versions of",
+               "fr": "Toutes les versions de"
+           },
+            "noVersionsFound": {
+                "en": "No alternative versions found for this track.",
+                "fr": "Aucune version alternative trouvée pour ce morceau."
+             },
+        "indexWelcomeHeading": {
+             "en": "Welcome to 8vb Music production music library",
+             "fr": "Bienvenue dans la bibliothèque musicale de production 8vb Music"
+        },
+        "indexWelcomePara1": {
+            "en": "Founded by musicians and video editors, our catalogue aims to address the requirements we encountered working in TV and Film post-production. However, our versatile music fits perfectly into any media project – games, podcasts, online content, and more. Our goal is to build a dynamic catalogue of distinctive music cues that are still easy to place into any edit timeline.",
+            "fr": "Fondé par des musiciens et des monteurs vidéo, notre catalogue vise à répondre aux exigences que nous avons rencontrées en travaillant en post-production TV et Film. Cependant, notre musique polyvalente s'adapte parfaitement à tout projet média - jeux, podcasts, contenu en ligne, et plus encore. Notre objectif est de construire un catalogue dynamique de morceaux musicaux distinctifs, tout en restant faciles à placer dans n'importe quelle ligne de montage."
+        },
+         "indexWelcomePara2": {
+            "en": "8vb Music is registered with <b>PRS/MCPS</b> and operate under the standard <b>PRS/MCPS</b> licensing, ensuring a straightforward clearance process for professional use worldwide, giving you peace of mind.",
+             "fr": "8vb Music est enregistré auprès de la <b>PRS/MCPS</b> et opère sous les licences standard <b>PRS/MCPS</b>, garantissant un processus d'autorisation simple pour une utilisation professionnelle dans le monde entier, vous offrant ainsi la tranquillité d'esprit."
+        },
+         "indexWelcomePara3": {
+             "en": "Explore our collection: You can search, audition, and download high-quality production music directly from our catalogue. Click any album cover on this page to browse its tracks, or <a href=\"search.html\">search</a> our entire collection by keywords, genre, mood, instrumentation, and more.",
+             "fr": "Explorez notre collection : Vous pouvez rechercher, auditionner et télécharger des fichiers audio de musique de production de haute qualité directement depuis notre catalogue. Cliquez sur n'importe quelle pochette d'album sur cette page pour parcourir ses morceaux, ou <a href=\"./search.html\">recherchez</a> notre collection complète par mots-clés, genre, humeur, instrumentation, et plus encore."
+            // Note: Corrected FR link to ./search.html
+        },
+        "indexWelcomePara4": {
+             "en": "Stems, cut-downs, and alternative mixes are available for most tracks. If you need these specific versions, please don't hesitate to <a href=\"contact.html\">contact us</a> with your requirements.",
+             "fr": "Les pistes séparées (stems), les versions raccourcies (cut-downs) et les mixages alternatifs sont disponibles pour la plupart des morceaux. Si vous avez besoin de ces versions spécifiques, n'hésitez pas à <a href=\"./contact.html\">nous contacter</a> avec vos besoins."
+             // Note: Corrected FR link to ./contact.html
+        }
+
+}

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de"> <!-- lang attribute will be set by common.js -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Title and meta tags - MANUALLY TRANSLATED -->
+    <title>Produktionsmusik suchen, probehören & herunterladen | 8vb Music Bibliothek</title> <!-- Translated Title -->
+	<meta name="description" content="description" content="Durchsuchen, suchen, probehören und laden Sie hochwertige Produktionsmusik-Titel aus der 8vb Music Bibliothek herunter. Finden Sie ganz einfach die perfekte Musik für Ihren Film, Ihr TV-Projekt, Ihr Spiel oder ein anderes Projekt. Jetzt reinhören!"> <!-- Translated Description -->
+
+    <!-- Path to style.css - CORRECTED relative path -->
+    <link rel="stylesheet" href="../style.css">
+
+</head>
+
+<body class="page-search">
+
+    <!-- Top Bar - Fixed container (BACKGROUND ONLY) -->
+    <div id="top-bar">
+        <!-- No content needed here, just for background -->
+    </div>
+
+    <!-- Logo Container - Fixed Top Left (ONLY ONCE) -->
+    <div id="logo-container">
+         <!-- Link href should be relative to current page's index -->
+         <!-- Path to logo - CORRECTED relative path -->
+        <a href="./index.html"><img src="../images/logo.jpg" alt="Logo 8vb Music"></a>
+    </div>
+
+
+
+
+    <!-- Menu Panel - Fixed -->
+    <div id="menu-panel">
+        <nav>
+            <ul>
+                 <!-- Link hrefs - CORRECTED relative paths -->
+                <li><a href="./index.html" data-translate="navHome">Accueil</a></li> <!-- Add data-translate -->
+                <li><a href="./search.html" data-translate="navSearch">Rechercher de la Musique</a></li> <!-- Add data-translate -->
+                <li><a href="./cue-sheet-metadata.html" data-translate="navMetadata">Rechercher des Métadonnées</a></li> <!-- Add data-translate -->
+                <li><a href="./contact.html" data-translate="navContact">Contactez-nous</a></li> <!-- Add data-translate -->
+				<li><a href="./Terms.html" data-translate="navLegal">Mentions Légales</a></li> <!-- Add data-translate -->
+                 <!-- Language Selector - Desktop Dropdown -->
+                <li class="language-menu-item">
+                    <span class="current-language" aria-haspopup="true" aria-expanded="false">
+                         <!-- Flag path - CORRECTED relative path -->
+                         <img src="../images/flags/fr.svg" alt="Deutsche Flagge" class="flag-icon"> DE
+                    </span>
+                    <ul class="language-dropdown">
+                         <li><a href="#" data-lang="en"><img src="../images/flags/gb.svg" alt="English Flag" class="flag-icon"> <span data-translate="langEN">EN</span></a></li> <!-- Add data-translate -->
+                         <li><a href="#" data-lang="fr"><img src="../images/flags/fr.svg" alt="French Flag" class="flag-icon"> <span data-translate="langFR">FR</span></a></li> <!-- Add data-translate -->
+                         <li><a href="#" data-lang="de"><img src="../images/flags/de.svg" alt="German Flag" class="flag-icon"> <span data-translate="langDE">DE</span></a></li>
+                         <li><a href="#" data-lang="es"><img src="../images/flags/es.svg" alt="Spanish Flag" class="flag-icon"> <span data-translate="langES">ES</span></a></li>
+                         <li><a href="#" data-lang="it"><img src="../images/flags/it.svg" alt="Italian Flag" class="flag-icon"> <span data-translate="langIT">IT</span></a></li>
+                         <!-- Add other languages here -->
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Search Controls Panel (Search.html ONLY) - Fixed -->
+    <div id="search-controls">
+         <!-- Add data-translate-placeholder -->
+        <input type="text" id="search-input" placeholder="Rechercher par genre, instrument, mot-clé, humeur" data-translate-placeholder="searchPlaceholder">
+        <div class="sort-container">
+             <!-- Add data-translate -->
+            <span class="sort-label" data-translate="showResultsLabel">Afficher les résultats :</span>
+             <!-- Add data-translate to options -->
+            <select id="sort-select">
+                <option value="alphabetical-asc" data-translate="sortAlphabeticalAsc">Alphabétiquement (A-Z)</option>
+                <option value="alphabetical-desc" data-translate="sortAlphabeticalDesc">Alphabétiquement (Z-A)</option>
+                <option value="isrc-asc" data-translate="sortOldestFirst">Plus Anciens d'Abord</option>
+                <option value="isrc-desc" data-translate="sortMostRecent">Plus Récents d'Abord</option>
+                <option value="random" data-translate="sortRandom">Ordre Aléatoire</option>
+            </select>
+        </div>
+    </div>
+
+<!-- Hamburger Icon Button (Mobile) -->
+    <button id="hamburger-icon" aria-label="Menü umschalten" aria-expanded="false">
+        <span></span> <!-- Line 1 -->
+        <span></span> <!-- Line 2 -->
+        <span></span> <!-- Line 3 -->
+    </button>
+
+    <!-- Mobile Menu Container -->
+    <div id="mobile-menu" aria-hidden="true">
+        <nav>
+            <ul>
+                <!-- Link hrefs and data-translate should match desktop -->
+                <li><a href="./index.html" data-translate="navHome">Accueil</a></li>
+                <li><a href="./search.html" data-translate="navSearch">Rechercher de la Musique</a></li>
+                <li><a href="./cue-sheet-metadata.html" data-translate="navMetadata">Rechercher des Métadonnées</a></li>
+                <li><a href="./contact.html" data-translate="navContact">Contactez-nous</a></li>
+				<li><a href="./Terms.html" data-translate="navLegal">Mentions Légales</a></li>
+                 <!-- Mobile language items added in common.js -->
+                <li class="mobile-lang-item"><a href="#" data-lang="en" data-translate="langEN">EN</a></li> <!-- Add data-translate -->
+                <li class="mobile-lang-item"><a href="#" data-lang="fr" data-translate="langFR">FR</a></li> <!-- Add data-translate -->
+                <li class="mobile-lang-item"><a href="#" data-lang="de" data-translate="langDE">DE</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="es" data-translate="langES">ES</a></li>
+                <li class="mobile-lang-item"><a href="#" data-lang="it" data-translate="langIT">IT</a></li>
+            </ul>
+        </nav>
+    </div>
+
+
+    <!-- Main content starts here -->
+    <div id="results"></div>
+    <div id="pagination-controls"></div>
+
+    <!-- Modal for showing all versions -->
+    <div id="versionsModal" class="modal">
+        <div class="modal-content">
+            <!-- Content structure here, actual text/data injected by JS -->
+            <!-- The data-translate attributes for the table headers are correctly placed in the JS -->
+             <div class="modal-header-info">
+                <span class="close">&times;</span>
+                <h2 id="modal-track-name"></h2> <!-- JS will populate, keep as is -->
+                <div class="artist" id="modal-artist"></div> <!-- JS will populate, keep as is -->
+            </div>
+            <div class="modal-layout">
+                <div class="album-cover">
+                    <!-- Image src/alt will be set by JS -->
+                    <img src="" alt="Album Cover" id="modal-album-artwork">
+                </div>
+                <div class="modal-info">
+                    <!-- JS will inject track versions table here -->
+                     <table id="modalVersions">
+                         <thead>
+                             <tr>
+                                 <!-- These data-translate attributes are added by JS in search-logic.js -->
+                                 <th>Version</th>
+                                 <th>Durée</th>
+                                 <th>ISRC</th>
+                                 <th>ISWC</th>
+                                 <th>Tunecode</th>
+                                 <th>Actions</th>
+                             </tr>
+                         </thead>
+                         <tbody>
+                            <!-- JS will populate -->
+                         </tbody>
+                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+	<footer id="page-footer">
+        <div class="footer-content">
+             <!-- Add data-translate -->
+            <p data-translate="footerCopyright">© 2024 8vb Music. Tous droits réservés.</p> <!-- Updated year and translated -->
+            <nav class="footer-legal-nav">
+                 <!-- Add data-translate and ensure relative links -->
+                 <a href="./Terms.html#terms-of-service-main" data-translate="footerTerms">Conditions d'Utilisation</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="./Terms.html#privacy-policy" data-translate="footerPrivacy">Politique de Confidentialité</a>
+                 <span>|</span> <!-- Separator -->
+                 <a href="./Terms.html#cookie-statement" data-translate="footerCookies">Politique de Cookies</a>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Script paths - CORRECTED relative paths -->
+	<script src="../js/common.js" defer></script>
+    <script src="../js/search-logic.js" defer></script>
+
+
+</body>
+</html>
