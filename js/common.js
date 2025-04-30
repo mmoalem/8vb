@@ -115,6 +115,11 @@ function applyStaticTranslations() {
 
 // Function to switch the language and redirect the user
 function setLanguage(lang) {
+
+    console.log("Current URL:", window.location.href);
+console.log("Current pathname:", window.location.pathname);
+console.log("Current page:", window.location.pathname.split('/').pop());
+
     const recognizedLanguages = ['en', 'fr', 'de', 'es', 'it'];
     if (!recognizedLanguages.includes(lang)) {
         console.error(`Common.js: Attempted to switch to an unrecognized language: ${lang}`);
@@ -128,67 +133,38 @@ function setLanguage(lang) {
 
     // Get the current URL path
     const currentPath = window.location.pathname;
-    const pathSegments = currentPath.split('/').filter(segment => segment !== '');
-    
-    // Debug current path
     console.log(`Common.js: Current path: ${currentPath}`);
-    console.log(`Common.js: Path segments:`, pathSegments);
     
-    // Determine if we're in a language subfolder
-    let currentLanguage = 'en'; // Default
-    let basePath = '/';
-    let pagePath = '';
+    // Extract the current page filename
+    const pathParts = currentPath.split('/');
+    let currentPage = pathParts[pathParts.length - 1];
     
-    // Check if any segment is a recognized language code
-    const langIndex = pathSegments.findIndex(seg => 
-        seg.length === 2 && recognizedLanguages.includes(seg.toLowerCase())
-    );
+    // If empty (directory path), default to index.html
+    if (!currentPage || currentPage === '') {
+        currentPage = 'index.html';
+    }
     
-    if (langIndex !== -1) {
-        // We're in a language subfolder
-        currentLanguage = pathSegments[langIndex].toLowerCase();
-        basePath = langIndex > 0 ? '/' + pathSegments.slice(0, langIndex).join('/') + '/' : '/';
-        pagePath = pathSegments.slice(langIndex + 1).join('/');
+    console.log(`Common.js: Current page: ${currentPage}`);
+    
+    // Construct the new URL based on language
+    let newPath;
+    
+    if (lang === 'en') {
+        // For English, use the root directory
+        newPath = `/${currentPage}`;
     } else {
-        // We're in the root (English) or a non-language path
-        // Determine base path (if any) and page path
-        if (pathSegments.length > 0) {
-            // Check if the last segment looks like a file (has extension)
-            const lastSegment = pathSegments[pathSegments.length - 1];
-            if (lastSegment.includes('.')) {
-                // It's a file, so everything before it is the base path
-                basePath = pathSegments.length > 1 ? 
-                    '/' + pathSegments.slice(0, pathSegments.length - 1).join('/') + '/' : '/';
-                pagePath = lastSegment;
-            } else {
-                // It's a directory, so the whole path is the base path
-                basePath = '/' + pathSegments.join('/') + '/';
-                pagePath = '';
-            }
-        }
+        // For other languages, use language subdirectory
+        newPath = `/${lang}/${currentPage}`;
     }
     
-    // If pagePath is empty and we're not at the root, default to index.html
-    if (!pagePath && currentPath !== '/' && !currentPath.endsWith('/index.html')) {
-        pagePath = 'index.html';
+    // Handle base path if site is in a subdirectory
+    const basePath = window.location.pathname.match(/^\/[^\/]+\//);
+    if (basePath) {
+        // Site is in a subdirectory (e.g., /8vbMusic/)
+        newPath = basePath[0] + newPath.substring(1);
     }
     
-    // Construct the new URL
-    let newPath = basePath;
-    
-    // Add language segment for non-English languages
-    if (lang !== 'en') {
-        newPath += lang + '/';
-    }
-    
-    // Add the page path
-    newPath += pagePath;
-    
-    // Debug the constructed path
-    console.log(`Common.js: Switching language from ${currentLanguage} to ${lang}`);
-    console.log(`Common.js: Base path: ${basePath}`);
-    console.log(`Common.js: Page path: ${pagePath}`);
-    console.log(`Common.js: New path: ${newPath}`);
+    console.log(`Common.js: Redirecting to: ${newPath}`);
     
     // Redirect to the new URL
     window.location.href = window.location.origin + newPath;
