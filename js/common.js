@@ -126,86 +126,71 @@ function setLanguage(lang) {
         return; // Do nothing if already in the target language
     }
 
-    const currentPagePath = window.location.pathname; // e.g., /8vbtest/search.html or /8vbtest/fr/page.html
-    const pathSegments = currentPagePath.split('/').filter(segment => segment !== ''); // e.g., ['8vbtest', 'search.html'] or ['8vbtest', 'fr', 'page.html']
-
-    let basePathSegments = [];
-    let langSegmentIndex = -1;
-    let pageSegments = [];
-    let currentPageName = '';
-
-    // --- Identify Base Path, Language, and Page Segments ---
-    // First, check if any segment is a language code
-    for (let i = 0; i < pathSegments.length; i++) {
-        const segmentLower = pathSegments[i].toLowerCase();
-        if (segmentLower.length === 2 && recognizedLanguages.includes(segmentLower)) {
-            langSegmentIndex = i;
-            break; // Stop at the first language code found
-        }
-    }
-
-    // If a language segment was found
-    if (langSegmentIndex !== -1) {
-        // Everything before the language code is the base path
-        basePathSegments = pathSegments.slice(0, langSegmentIndex);
-        // Everything after the language code is the page path
-        pageSegments = pathSegments.slice(langSegmentIndex + 1);
+    // Get the current URL path
+    const currentPath = window.location.pathname;
+    const pathSegments = currentPath.split('/').filter(segment => segment !== '');
+    
+    // Debug current path
+    console.log(`Common.js: Current path: ${currentPath}`);
+    console.log(`Common.js: Path segments:`, pathSegments);
+    
+    // Determine if we're in a language subfolder
+    let currentLanguage = 'en'; // Default
+    let basePath = '/';
+    let pagePath = '';
+    
+    // Check if any segment is a recognized language code
+    const langIndex = pathSegments.findIndex(seg => 
+        seg.length === 2 && recognizedLanguages.includes(seg.toLowerCase())
+    );
+    
+    if (langIndex !== -1) {
+        // We're in a language subfolder
+        currentLanguage = pathSegments[langIndex].toLowerCase();
+        basePath = langIndex > 0 ? '/' + pathSegments.slice(0, langIndex).join('/') + '/' : '/';
+        pagePath = pathSegments.slice(langIndex + 1).join('/');
     } else {
-        // If no language segment was found, assume the last segment is the page
-        // and everything before it is the base path (for simple cases)
+        // We're in the root (English) or a non-language path
+        // Determine base path (if any) and page path
         if (pathSegments.length > 0) {
+            // Check if the last segment looks like a file (has extension)
             const lastSegment = pathSegments[pathSegments.length - 1];
-            // Check if the last segment looks like a file (contains a dot)
             if (lastSegment.includes('.')) {
-                basePathSegments = pathSegments.slice(0, pathSegments.length - 1);
-                pageSegments = [lastSegment];
-                currentPageName = lastSegment; // Store the current page name
+                // It's a file, so everything before it is the base path
+                basePath = pathSegments.length > 1 ? 
+                    '/' + pathSegments.slice(0, pathSegments.length - 1).join('/') + '/' : '/';
+                pagePath = lastSegment;
             } else {
-                // If the last segment doesn't look like a file, it might be a directory
-                basePathSegments = pathSegments;
-                pageSegments = [];
+                // It's a directory, so the whole path is the base path
+                basePath = '/' + pathSegments.join('/') + '/';
+                pagePath = '';
             }
         }
     }
-
-    // --- Reconstruct Paths ---
-    // Base path (e.g., / or /8vbtest/)
-    const basePath = basePathSegments.length > 0 ? '/' + basePathSegments.join('/') + '/' : '/';
     
-    // Get the page name (e.g., search.html, contact.html)
-    let pagePath = '';
-    if (pageSegments.length > 0) {
-        pagePath = pageSegments.join('/');
-    } else if (currentPageName) {
-        // If we're on a root page (like /search.html), use that page name
-        pagePath = currentPageName;
-    } else if (currentPagePath.endsWith('/')) {
-        // If we're on a directory path ending with /, assume index.html
-        pagePath = 'index.html';
-    } else {
-        // Default to index.html if we can't determine the page
+    // If pagePath is empty and we're not at the root, default to index.html
+    if (!pagePath && currentPath !== '/' && !currentPath.endsWith('/index.html')) {
         pagePath = 'index.html';
     }
-
-    // --- Construct the New Path ---
-    let newPath = basePath; // Start with the base path
-
-    // Add language prefix for non-english languages
+    
+    // Construct the new URL
+    let newPath = basePath;
+    
+    // Add language segment for non-English languages
     if (lang !== 'en') {
-        newPath += lang + '/'; // e.g., /fr/ or /8vbtest/fr/
+        newPath += lang + '/';
     }
-
-    // Add the page path if it exists
-    if (pagePath) {
-        newPath += pagePath; // e.g., search.html or folder/page.html
-    }
-
-    console.log(`Common.js: Switching language from ${currentLang} to ${lang}.`);
-    console.log(`Common.js: Base path detected: ${basePath}`);
+    
+    // Add the page path
+    newPath += pagePath;
+    
+    // Debug the constructed path
+    console.log(`Common.js: Switching language from ${currentLanguage} to ${lang}`);
+    console.log(`Common.js: Base path: ${basePath}`);
     console.log(`Common.js: Page path: ${pagePath}`);
-    console.log(`Common.js: Redirecting to: ${newPath}`);
-
-    // Redirect the user to the new URL
+    console.log(`Common.js: New path: ${newPath}`);
+    
+    // Redirect to the new URL
     window.location.href = window.location.origin + newPath;
 }
 
